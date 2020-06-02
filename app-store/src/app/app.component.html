@@ -1,0 +1,42 @@
+<mat-toolbar color="primary">
+  <div fxLayout="row" style="width: 100%;" fxLayoutAlign="start center" fxLayoutGap="10px">
+      <div><img style="width: 36px; height: 36px;" src="assets/icons/icon-72x72.png" /></div>
+      <div fxFlex fxFlexFill>
+      </div>
+      <button *ngIf="!isAuthenticated else showLogin" mat-icon-button (click)="login()">
+          <mat-icon>input</mat-icon>
+      </button>
+  </div>
+</mat-toolbar>
+<div style="height: calc(100vh-64px); width: 100%; padding: 15px; font-weight: 800; font-size: 4em;">
+  <div *ngIf="isAuthenticated" fxLayout="row wrap" fxLayoutAlign="center center" fxLayoutGap="16px">
+      <ng-container *ngFor="let app of apps">
+          <mat-card>
+              <mat-card-content>
+                  <div style="margin: 8px; padding: 16px; text-align: center; font-size: x-large;">
+                      <span>{{ app.name | uppercase }} </span>
+                  </div>
+                  <mat-divider>
+                  </mat-divider>
+              </mat-card-content>
+              <mat-card-actions>
+                  <div style="text-align: center;">
+                      <button mat-button (click)="launch(app)">
+                          <mat-icon>arrow_forward</mat-icon>
+                      </button>
+                  </div>
+              </mat-card-actions>
+          </mat-card>
+      </ng-container>
+  </div>
+</div>
+<ng-template #showLogin>
+  <div>
+      <mat-menu #appMenu="matMenu">
+          <button mat-menu-item (click)="logout()">Logout</button>
+      </mat-menu>
+      <button mat-button [matMenuTriggerFor]="appMenu">
+          <span>{{userData.name}}</span>
+      </button>
+  </div>
+</ng-template>

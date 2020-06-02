@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  keycloak:
+    image: jboss/keycloak:10.0.1
+    networks:
+    - k-network
+    ports:
+    - 18080:8080
+    volumes: 
+      - ${PWD}/keycloak/universal-realm.json:/tmp/universal-realm.json
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_IMPORT: /tmp/universal-realm.json
+      DB_VENDOR: h2
+#      DB_VENDOR: mysql
+#      DB_DATABASE: keycloak
+#      DB_USER: keycloak
+#      DB_PASSWORD: password
+#  mysql:
+#    image: mysql
+#    networks:
+#    - k-network
+#    environment:
+#       MYSQL_ROOT_PASSWORD: password
+#       MYSQL_DATABASE: keycloak
+#       MYSQL_USER: keycloak
+#       MYSQL_PASSWORD: password
+
+networks:
+  k-network:

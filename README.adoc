@@ -1,0 +1,52 @@
+
+:icon: font
+
+# Spring WebFlux with Keycloak and Angular SSO Example
+
+## Features
+- Spring WebFlux as Resource Server.
+- Keycloak as OIDC provider.
+- Angular application with SSO.
+- App store example
+- Launch Employee Angular front end directly or using app store.
+- Two roles Admin and user roles supported.
+- Admin can perform CRUD operations.
+- User role can view only.
+- Role validation is done both at frontend and backend.
+- username and password - admin -> admin1/password - user -> user1/password
+
+## How to run.
+
+- Change application redirect uri ipaddress to host ip where the application will be run in `keycloak/universal-realm.json`
+- Change employee-app ipaddress in app-store `app-store/src/app/assets/config/apps.json` to host IP where the application will be running.
+- Change keycloak ipaddress in app-store `app-store/src/app/assets/config/oidc.json` to host IP where the keycloak will be running.
+- Change keycloak ipaddress in employee-app `employee-app/src/app/assets/config/oidc.json` to host IP where the keycloak will be running.
+- Change employee-backend ipaddress in employee-app `employee-app/proxy-config.json` to host IP where the employee-backend will be running.
+- Change keycloak ipaddress in employee-backend `employee-backend/src/main/resources/application.yml` to host IP where the keycloak will be running.
+- start keycloak
++
+----
+docker-compose up -d
+----
+
+- Build and start app-store
++
+----
+$ cd app-store
+$ npm install
+$ ng serve --host 0.0.0.0
+----
+- Build and start emplyee-app
++
+----
+$ cd emplyee-app
+$ npm install
+$ ng serve --host 0.0.0.0 --port 4201
+----
+- start employee backend
++
+----
+$ cd employee-backend
+$ mvn spring-boot:run
+----
+- now app-store can be accessed on url `http://localhost:4200`
