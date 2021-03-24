@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { OidcConfigService, OidcSecurityService } from 'angular-auth-oidc-client';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 @Component({
   selector: 'k-home',
@@ -13,7 +13,6 @@ export class HomeComponent implements OnInit {
   isAuthenticated: boolean;
 
   constructor(private http: HttpClient,
-    private oidcConfigService: OidcConfigService,
     public oidcSecurityService: OidcSecurityService) {
 
   }

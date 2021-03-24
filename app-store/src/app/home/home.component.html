@@ -1,0 +1,49 @@
+<div fxLayout="column" fxFlexFill fxLayoutGap="5px">
+    <mat-toolbar color="primary">
+        <span>APP STORE</span>
+        <div fxFlex fxFlexFill></div>
+        <div>
+            <ng-container *ngIf="user; else nouser">
+                <mat-label>{{ user }}</mat-label>
+                <button mat-icon-button [matMenuTriggerFor]="appMenu">
+                    <mat-icon>person</mat-icon>
+                </button>
+            </ng-container>
+            <ng-template #nouser>
+                <button mat-icon-button [matMenuTriggerFor]="appMenu">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            </ng-template>
+            <mat-menu #appMenu="matMenu">
+                <button mat-menu-item>Settings</button>
+                <button mat-menu-item>Help</button>
+                <mat-divider></mat-divider>
+                <button (click)="logout()" mat-menu-item>Logout</button>
+            </mat-menu>
+        </div>
+    </mat-toolbar>
+    <div fxFlex style="overflow: scroll;">
+        <div fxLayout="column" style="height: 100%;" fxLayoutAlign="center center">
+            <ng-container *ngFor="let app of apps">
+                <mat-card>
+                    <mat-card-header>
+                        <mat-card-title>{{ app.title }}</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                       
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <div style="text-align: center;"><a [href]="app.url" target="_blank" color="accent" mat-raised-button>
+                                <mat-icon>arrow_right_alt</mat-icon>
+                        </a></div>
+                    </mat-card-actions>
+                </mat-card>
+            </ng-container>
+        </div>
+    </div>
+    <mat-toolbar color="primary">
+        <div fxLayout="row" fxLayoutAlign="center center" style="width: 100%">
+            All Rights Reserved 2003-2020 @ Karthik Prasad
+        </div>
+    </mat-toolbar>
+</div>

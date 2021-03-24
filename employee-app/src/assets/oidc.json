@@ -1,0 +1,23 @@
+{
+    "generateBaseUrl": "false",
+    "baseUrl": "",
+    "appPrefix": "",
+    "stsServer": "http://192.168.56.121:18080/auth/realms/universal",
+    "redirectUrl": "http://192.168.56.121:4201/",
+    "clientId": "kp_app1",
+    "responseType": "code",
+    "scope": "openid profile email",
+    "postLogoutRedirectUri": "http://192.168.56.121:4201/#/sign-out",
+    "startCheckSession": "false",
+    "silentRenew": "true",
+    "silentRenewUrl": "http://192.168.56.121:4201/assets/silent-renew.html",
+    "renewTimeBeforeTokenExpiresInSeconds": 30,
+    "postLoginRoute": "/home",
+    "forbiddenRoute": "/forbidden",
+    "unauthorizedRoute": "/unauthorized",
+    "logLevel": "0",
+    "maxIdTokenIatOffsetAllowedInSeconds": "60",
+    "historyCleanupOff": "true",
+    "autoUserinfo": "true",
+    "disableIatOffsetValidation": "false"
+}

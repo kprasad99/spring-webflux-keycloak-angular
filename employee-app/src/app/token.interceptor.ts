@@ -16,12 +16,11 @@ export class TokenInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let token: string;
     try {
-      token = this.oidc.getIdToken()
-    }catch(err){
+      token = this.oidc.getToken()
+    } catch (err) {
 
     }
-
-    if (!token) {
+    if (token && request.url.trim().startsWith('/api')) {
       const tokenValue = `Bearer ${token}`;
       request = request.clone({
         setHeaders: {
