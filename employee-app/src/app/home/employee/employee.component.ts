@@ -41,14 +41,14 @@ export class EmployeeComponent implements OnInit {
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
-  isAllSelected() {
+  isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
     return numSelected === numRows;
   }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
+  masterToggle(): void {
     this.isAllSelected() ?
       this.selection.clear() :
       this.dataSource.data.forEach(row => this.selection.select(row));
@@ -62,7 +62,7 @@ export class EmployeeComponent implements OnInit {
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  add() {
+  add(): void {
     const dialogRef = this.dialog.open(EmployeeDialogComponent, {
       width: '360px',
       data: {}
@@ -72,14 +72,14 @@ export class EmployeeComponent implements OnInit {
     });
   }
 
-  remove() {
+  remove(): void {
     this.selection.selected.forEach(e => this.empService.remove(e).subscribe(r => {
       this.dataSource.data = this.removeItem(this.dataSource.data, 'id', e.id);
     }));
     this.selection.clear();
   }
 
-  removeItem(arr: any[], prop: string, key: any) {
+  removeItem(arr: any[], prop: string, key: any): any[] {
     const index = arr.findIndex(e => e[prop] === key);
     if (index > -1) {
       arr.splice(index, 1);

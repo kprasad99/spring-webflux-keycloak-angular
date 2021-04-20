@@ -799,6 +799,83 @@
             ]
         },
         {
+            "id": "376d9e37-44fe-41b3-9a54-94114f3583ff",
+            "clientId": "kp_prod_app1",
+            "name": "Application 1",
+            "description": "A Sample Application One",
+            "rootUrl": "http://192.168.56.121/emp-app",
+            "adminUrl": "http://192.168.56.121/emp-app",
+            "surrogateAuthRequired": false,
+            "enabled": true,
+            "alwaysDisplayInConsole": false,
+            "clientAuthenticatorType": "client-secret",
+            "secret": "123456789",
+            "redirectUris": [
+                "http://192.168.56.121/emp-app/*"
+            ],
+            "webOrigins": [
+                "+"
+            ],
+            "notBefore": 0,
+            "bearerOnly": false,
+            "consentRequired": false,
+            "standardFlowEnabled": true,
+            "implicitFlowEnabled": true,
+            "directAccessGrantsEnabled": true,
+            "serviceAccountsEnabled": false,
+            "publicClient": true,
+            "frontchannelLogout": false,
+            "protocol": "openid-connect",
+            "attributes": {
+                "saml.assertion.signature": "false",
+                "saml.force.post.binding": "false",
+                "saml.multivalued.roles": "false",
+                "saml.encrypt": "false",
+                "saml.server.signature": "false",
+                "saml.server.signature.keyinfo.ext": "false",
+                "exclude.session.state.from.auth.response": "false",
+                "saml_force_name_id_format": "false",
+                "saml.client.signature": "false",
+                "tls.client.certificate.bound.access.tokens": "false",
+                "saml.authnstatement": "false",
+                "display.on.consent.screen": "false",
+                "saml.onetimeuse.condition": "false"
+            },
+            "authenticationFlowBindingOverrides": {},
+            "fullScopeAllowed": true,
+            "nodeReRegistrationTimeout": -1,
+            "protocolMappers": [
+                {
+                    "id": "ed53689c-65e5-4529-acc1-11525900080d",
+                    "name": "authorities",
+                    "protocol": "openid-connect",
+                    "protocolMapper": "oidc-usermodel-client-role-mapper",
+                    "consentRequired": false,
+                    "config": {
+                        "usermodel.clientRoleMapping.rolePrefix": "ROLE_",
+                        "multivalued": "true",
+                        "userinfo.token.claim": "true",
+                        "id.token.claim": "true",
+                        "access.token.claim": "true",
+                        "claim.name": "authorities"
+                    }
+                }
+            ],
+            "defaultClientScopes": [
+                "web-origins",
+                "role_list",
+                "roles",
+                "profile",
+                "email"
+            ],
+            "optionalClientScopes": [
+                "address",
+                "phone",
+                "offline_access",
+                "microprofile-jwt"
+            ]
+        },
+        {
             "id": "abc117c5-1bd8-4b8f-9fdb-2d6ab8a50c51",
             "clientId": "kp_appstore",
             "rootUrl": "http://192.168.56.121:4200",
@@ -828,6 +905,82 @@
             "protocolMappers": [
                 {
                     "id": "bd43689c-65e5-4529-acc1-11525900080a",
+                    "name": "authorities",
+                    "protocol": "openid-connect",
+                    "protocolMapper": "oidc-usermodel-client-role-mapper",
+                    "consentRequired": false,
+                    "config": {
+                        "usermodel.clientRoleMapping.rolePrefix": "ROLE_",
+                        "multivalued": "true",
+                        "userinfo.token.claim": "true",
+                        "id.token.claim": "true",
+                        "access.token.claim": "true",
+                        "claim.name": "authorities"
+                    }
+                }
+            ],
+            "attributes": {
+                "saml.assertion.signature": "false",
+                "saml.force.post.binding": "false",
+                "saml.multivalued.roles": "false",
+                "saml.encrypt": "false",
+                "saml.server.signature": "false",
+                "saml.server.signature.keyinfo.ext": "false",
+                "exclude.session.state.from.auth.response": "false",
+                "saml_force_name_id_format": "false",
+                "saml.client.signature": "false",
+                "tls.client.certificate.bound.access.tokens": "false",
+                "saml.authnstatement": "false",
+                "display.on.consent.screen": "false",
+                "saml.onetimeuse.condition": "false"
+            },
+            "authenticationFlowBindingOverrides": {},
+            "fullScopeAllowed": true,
+            "nodeReRegistrationTimeout": -1,
+            "defaultClientScopes": [
+                "web-origins",
+                "role_list",
+                "roles",
+                "profile",
+                "email"
+            ],
+            "optionalClientScopes": [
+                "address",
+                "phone",
+                "offline_access",
+                "microprofile-jwt"
+            ]
+        },
+        {
+            "id": "abc117c5-1bd8-4b8f-9fdb-2d6ab8a50c5d",
+            "clientId": "kp_prod_appstore",
+            "rootUrl": "http://192.168.56.121/app-store",
+            "adminUrl": "http://192.168.56.121/app-store",
+            "surrogateAuthRequired": false,
+            "enabled": true,
+            "alwaysDisplayInConsole": false,
+            "clientAuthenticatorType": "client-secret",
+            "secret": "123456789",
+            "redirectUris": [
+                "http://192.168.56.121/app-store/*"
+            ],
+            "webOrigins": [
+                "http://192.168.56.121/app-store",
+                "+"
+            ],
+            "notBefore": 0,
+            "bearerOnly": false,
+            "consentRequired": false,
+            "standardFlowEnabled": true,
+            "implicitFlowEnabled": true,
+            "directAccessGrantsEnabled": true,
+            "serviceAccountsEnabled": false,
+            "publicClient": true,
+            "frontchannelLogout": false,
+            "protocol": "openid-connect",
+            "protocolMappers": [
+                {
+                    "id": "bd43689c-65e5-4529-acc1-11525900080b",
                     "name": "authorities",
                     "protocol": "openid-connect",
                     "protocolMapper": "oidc-usermodel-client-role-mapper",

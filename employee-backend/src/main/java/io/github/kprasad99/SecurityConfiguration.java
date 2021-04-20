@@ -2,6 +2,7 @@ package io.github.kprasad99;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -16,6 +17,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import io.github.kprasad99.security.GrantedAuthoritiesExtractor;
 import reactor.core.publisher.Mono;
 
+@ConditionalOnProperty(name = "spring.security.oauth2.resourceserver.jwt.issuer-uri")
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class SecurityConfig {

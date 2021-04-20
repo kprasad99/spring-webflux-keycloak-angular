@@ -8,7 +8,7 @@ import { OidcSecurityService } from 'angular-auth-oidc-client';
 })
 export class SsoComponent implements OnInit {
 
-  constructor(private oidcSecurityService: OidcSecurityService) {}
+  constructor(private oidcSecurityService: OidcSecurityService) { }
 
   ngOnInit(): void {
     this.oidcSecurityService.authorize();

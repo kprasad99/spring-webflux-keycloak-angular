@@ -16,7 +16,7 @@ export class TokenInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let token: string;
     try {
-      token = this.oidc.getToken()
+      token = this.oidc.getToken();
     } catch (err) {
 
     }

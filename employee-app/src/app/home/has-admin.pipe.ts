@@ -5,8 +5,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class HasAdminPipe implements PipeTransform {
 
-  transform(value: String[], ...args: unknown[]): boolean {
-    if(!value){
+  transform(value: string[], ...args: unknown[]): boolean {
+    if (!value) {
       return false;
     }
     const indx = value.findIndex(e => e.endsWith('ADMIN'));

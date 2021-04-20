@@ -14,11 +14,11 @@ export class EmployeeService {
     return this.http.put<Employee>('/api/employee', emp);
   }
 
-  remove(emp: Employee) {
-    return this.http.delete(`/api/employee/${emp.id}`);
+  remove(emp: Employee): Observable<void> {
+    return this.http.delete<void>(`/api/employee/${emp.id}`);
   }
 
-  list() {
+  list(): Observable<Employee[]> {
     return this.http.get<Employee[]>('/api/employee');
   }
 }

@@ -7,7 +7,7 @@ import { EmployeeComponent } from './employee/employee.component';
 const routes: Routes = [{
   path: '',
   component: HomeComponent,
-  children:[
+  children: [
     {
       path: '',
       component: EmployeeComponent

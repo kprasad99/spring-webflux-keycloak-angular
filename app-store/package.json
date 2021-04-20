@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build-prod": "ng build --prod --base-href /app-store/ --deploy-url /app-store/ --output-path dist/app/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -24,6 +25,7 @@
     "@angular/router": "~11.2.6",
     "@angular/service-worker": "~11.2.6",
     "angular-auth-oidc-client": "^11.6.4",
+    "lodash": "^4.17.21",
     "rxjs": "~6.6.7",
     "tslib": "^2.0.0",
     "zone.js": "~0.11.3"
@@ -33,6 +35,7 @@
     "@angular/cli": "~11.2.5",
     "@angular/compiler-cli": "~11.2.6",
     "@types/jasmine": "~3.6.0",
+    "@types/lodash": "^4.14.168",
     "@types/node": "^12.11.1",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",

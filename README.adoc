@@ -15,9 +15,20 @@
 - Role validation is done both at frontend and backend.
 - username and password - admin -> admin1/password - user -> user1/password
 
-## How to run.
+## How to run using docker-compose
 
-- Change application redirect uri ipaddress to host ip where the application will be run in `keycloak/universal-realm.json`
+- Replace all occurance of IP Address in `keycloak/universal-realm.json` with your host IP Address.
+- Replace all occurance of IP Address in `docker-compose.yml` with your host IP Address.
+- Start the applications using docker-compose
++
+----
+$ docker-compose up -d
+----
+- Now you can access the application at  url `http://<host-ip>
+
+## How to run apps using `ng serve` with just keycloak using docker.
+
+- Change application redirect uri ipaddress to host ip where the application will run in `keycloak/universal-realm.json`
 - Change employee-app ipaddress in app-store `app-store/src/app/assets/config/apps.json` to host IP where the application will be running.
 - Change keycloak ipaddress in app-store `app-store/src/app/assets/config/oidc.json` to host IP where the keycloak will be running.
 - Change keycloak ipaddress in employee-app `employee-app/src/app/assets/config/oidc.json` to host IP where the keycloak will be running.
@@ -26,7 +37,7 @@
 - start keycloak
 +
 ----
-docker-compose up -d
+docker-compose up -d keycloak
 ----
 
 - Build and start app-store
