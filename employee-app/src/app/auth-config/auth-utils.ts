@@ -8,7 +8,7 @@ export class AuthUtils {
     }
 
     static toIntWithDefault(value: string, defaultValue: number): number {
-        return value ? +defaultValue : 0;
+        return value ? +value: defaultValue;
     }
 
     static toBoolWithDefault(value: string, defaultValue: boolean): boolean {

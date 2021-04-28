@@ -8,7 +8,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   templateUrl: './employee-dialog.component.html',
   styleUrls: ['./employee-dialog.component.scss']
 })
-export class EmployeeDialogComponent implements OnInit {
+export class EmployeeDialogComponent {
 
   empForm = new FormGroup({
     firstName: new FormControl('', [
@@ -28,9 +28,6 @@ export class EmployeeDialogComponent implements OnInit {
 
   onNoClick(): void {
     this.dialogRef.close();
-  }
-
-  ngOnInit(): void {
   }
 
 }

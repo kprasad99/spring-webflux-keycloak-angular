@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 @ConditionalOnProperty(name = "spring.security.oauth2.resourceserver.jwt.issuer-uri")
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
-public class SecurityConfig {
+public class SecurityConfiguration {
 
 	@Bean
 	SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {

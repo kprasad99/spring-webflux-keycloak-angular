@@ -26,6 +26,14 @@ $ docker-compose up -d
 ----
 - Now you can access the application at  url `http://<host-ip>
 
+[NOTE]
+====
+To rebuild and run single container
+[source,shell]
+----
+$ docker-compose up -d --force-recreate --no-deps --build -V <service-name>
+----
+====
 ## How to run apps using `ng serve` with just keycloak using docker.
 
 - Change application redirect uri ipaddress to host ip where the application will run in `keycloak/universal-realm.json`

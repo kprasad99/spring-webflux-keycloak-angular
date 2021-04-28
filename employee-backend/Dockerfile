@@ -43,6 +43,7 @@ FROM alpine:3.13
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 ENV PATH="$PATH:$JAVA_HOME/bin"
 ENV JAVA_OPTS=""
+ENV SERVER_PORT=8080
 
 WORKDIR /app
 VOLUME /tmp
@@ -55,5 +56,7 @@ COPY --from=builder ${DEPENDENCY}/dependencies/ ./
 COPY --from=builder ${DEPENDENCY}/spring-boot-loader/ ./
 COPY --from=builder ${DEPENDENCY}/snapshot-dependencies/ ./
 COPY --from=builder ${DEPENDENCY}/application/ ./
+
+EXPOSE ${SERVER_PORT}
 
 ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
