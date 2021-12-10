@@ -1,8 +1,14 @@
 {
-    "/api": {
-        "target": "http://192.168.56.121:8080",
-        "changeOrigin": true,
-        "secure": false,
-        "logLevel": "debug"
-    }
+  "/api": {
+    "target": "http://192.168.56.121:8080",
+    "changeOrigin": true,
+    "secure": false,
+    "logLevel": "debug"
+  },
+  "/auth": {
+    "target": "https://192.168.56.121",
+    "changeOrigin": true,
+    "secure": false,
+    "logLevel": "debug"
+  }
 }

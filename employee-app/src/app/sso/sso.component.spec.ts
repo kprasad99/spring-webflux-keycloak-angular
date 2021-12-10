@@ -8,9 +8,8 @@ describe('SsoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SsoComponent ]
-    })
-    .compileComponents();
+      declarations: [SsoComponent]
+    }).compileComponents();
   });
 
   beforeEach(() => {
