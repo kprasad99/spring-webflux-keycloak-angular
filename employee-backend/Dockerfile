@@ -20,7 +20,7 @@ jdk.crypto.ec,jdk.unsupported \
     --release-info="add:IMPLEMENTOR=Karthik:IMPLEMENTOR_VERSION=jre-17" \
     --output "$JAVA_MINIMAL"
 
-FROM gradle:7.3-jdk17 as builder
+FROM gradle:7.4-jdk17 as builder
 
 WORKDIR /app
 
