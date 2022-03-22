@@ -21,7 +21,7 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.oidcSecurityService.userData$.pipe(filter(Boolean)).subscribe((v: any) => (this.user = v.preferred_username));
+    this.oidcSecurityService.userData$.pipe(filter(Boolean)).subscribe((v: any) => (this.user = v.userData.preferred_username));
     this.oidcSecurityService.isAuthenticated$.subscribe(e => (this.isAuthenticated = e.isAuthenticated));
     // setTimeout(() => {
     //   this.eventService
