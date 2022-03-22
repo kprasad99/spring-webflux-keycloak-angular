@@ -4,7 +4,7 @@
     "appPrefix": "",
     "authority": "https://192.168.56.121:4201/auth/realms/universal",
     "redirect_url": "https://192.168.56.121:4201/",
-    "clientId": "kp_test_client1",
+    "clientId": "kp_app1",
     "responseType": "code",
     "scope": "openid profile email",
     "postLogoutRedirectUri": "https://192.168.56.121:4201/#/sign-out",
