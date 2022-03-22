@@ -39,7 +39,7 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
           60
         ),
         disableIatOffsetValidation: AuthUtils.toBoolWithDefault(customConfig.disableIatOffsetValidation, false),
-        historyCleanupOff: AuthUtils.toBoolWithDefault(customConfig.historyCleanupOff, true),
+        historyCleanupOff: AuthUtils.toBoolWithDefault(customConfig.historyCleanupOff, false),
         autoUserInfo: AuthUtils.toBoolWithDefault(customConfig.autoUserInfo, true)
       };
     })
