@@ -2,7 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { NgModule } from '@angular/core';
 
-import { AutoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
+import { AutoLoginAllRoutesGuard, AutoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
 
 import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { SignOutComponent } from './sign-out/sign-out.component';
@@ -31,16 +31,16 @@ const routes: Routes = [
     component: SsoComponent,
     canActivate: [AutoLoginPartialRoutesGuard]
   },
+
   {
     path: '',
     pathMatch: 'full',
     redirectTo: 'home'
-  },
-  {
+  },  {
     path: 'home',
     pathMatch: 'full',
-    loadChildren: () => import('./home/home.module').then(m => m.HomeModule)
-    // canLoad: [AutoLoginPartialRoutesGuard]
+    loadChildren: () => import('./home/home.module').then(m => m.HomeModule),
+     canLoad: [AutoLoginAllRoutesGuard]
   }
 ];
 

@@ -17,7 +17,7 @@
     "unauthorizedRoute": "unauthorized",
     "logLevel": "0",
     "maxIdTokenIatOffsetAllowedInSeconds": "60",
-    "historyCleanupOff": "true",
+    "historyCleanupOff": "false",
     "autoUserinfo": "true",
     "disableIatOffsetValidation": "false",
     "triggerAuthorizationResultEvent": "true"
