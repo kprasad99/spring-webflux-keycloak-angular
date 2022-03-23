@@ -1,14 +1,15 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Employee } from './employee.component';
+import { Injectable } from '@angular/core';
+
 import { Observable } from 'rxjs';
+
+import { Employee } from './employee.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmployeeService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   add(emp: Employee): Observable<Employee> {
     return this.http.put<Employee>('/api/employee', emp);

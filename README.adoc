@@ -15,7 +15,7 @@
 - Role validation is done both at frontend and backend.
 - username and password - admin -> admin1/password - user -> user1/password
 
-## How to run using docker-compose
+## How to run using docker-compose [WIP]
 
 - Replace all occurance of IP Address in `keycloak/universal-realm.json` with your host IP Address.
 - Replace all occurance of IP Address in `docker-compose.yml` with your host IP Address.
@@ -53,14 +53,14 @@ docker-compose up -d keycloak
 ----
 $ cd app-store
 $ npm install
-$ ng serve --host 0.0.0.0
+$ ng serve --host 0.0.0.0 --ssl
 ----
 - Build and start emplyee-app
 +
 ----
 $ cd emplyee-app
 $ npm install
-$ ng serve --host 0.0.0.0 --port 4201
+$ ng serve --host 0.0.0.0 --port 4201 --ssl
 ----
 - start employee backend
 +
@@ -68,4 +68,4 @@ $ ng serve --host 0.0.0.0 --port 4201
 $ cd employee-backend
 $ mvn spring-boot:run
 ----
-- now app-store can be accessed on url `http://localhost:4200`
+- now app-store can be accessed on url `https://localhost:4200`

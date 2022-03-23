@@ -1,9 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 @Component({
-  selector: 'k-root',
+  selector: 'kp-root',
   template: `<router-outlet></router-outlet>`
 })
-export class AppComponent {
-  title = 'app-store';
-}
+export class AppComponent {}

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { EmployeeService } from './employee.service';
-import { MatDialog } from '@angular/material/dialog';
-import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.component';
 
+import { OidcSecurityService } from 'angular-auth-oidc-client';
+
+import { EmployeeDialogComponent } from '../employee-dialog/employee-dialog.component';
+import { EmployeeService } from './employee.service';
 
 export interface Employee {
   id: number;
@@ -20,24 +22,23 @@ export interface Column {
 }
 
 @Component({
-  selector: 'k-employee',
+  selector: 'kp-employee',
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.scss']
 })
 export class EmployeeComponent implements OnInit {
-
   displayedColumns: string[] = ['select', 'firstName', 'lastName', 'age'];
   dataSource = new MatTableDataSource<Employee>();
   selection = new SelectionModel<Employee>(true, []);
   userData: any = {};
 
-  constructor(private auth: OidcSecurityService, private empService: EmployeeService, public dialog: MatDialog) { }
+  constructor(private auth: OidcSecurityService, private empService: EmployeeService, public dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.auth.userData$.subscribe(e => {
       this.userData = e;
     });
-    this.empService.list().subscribe(e => this.dataSource.data = e);
+    this.empService.list().subscribe(e => (this.dataSource.data = e));
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -49,9 +50,7 @@ export class EmployeeComponent implements OnInit {
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle(): void {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
+    this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach(row => this.selection.select(row));
   }
 
   /** The label for the checkbox on the passed row */
@@ -68,14 +67,16 @@ export class EmployeeComponent implements OnInit {
       data: {}
     });
     dialogRef.afterClosed().subscribe(result => {
-      this.empService.add(result).subscribe(r => this.dataSource.data = [...this.dataSource.data, r]);
+      this.empService.add(result).subscribe(r => (this.dataSource.data = [...this.dataSource.data, r]));
     });
   }
 
   remove(): void {
-    this.selection.selected.forEach(e => this.empService.remove(e).subscribe(r => {
-      this.dataSource.data = this.removeItem(this.dataSource.data, 'id', e.id);
-    }));
+    this.selection.selected.forEach(e =>
+      this.empService.remove(e).subscribe(r => {
+        this.dataSource.data = this.removeItem(this.dataSource.data, 'id', e.id);
+      })
+    );
     this.selection.clear();
   }
 
@@ -86,5 +87,4 @@ export class EmployeeComponent implements OnInit {
     }
     return [...arr];
   }
-
 }

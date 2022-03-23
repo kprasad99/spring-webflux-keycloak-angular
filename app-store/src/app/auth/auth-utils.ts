@@ -1,8 +1,6 @@
-
-import { camelCase } from 'lodash';
+import { camelCase } from 'lodash-es';
 
 export class AuthUtils {
-
   static toInt(value: string): number {
     return value ? +value : 0;
   }
@@ -13,7 +11,7 @@ export class AuthUtils {
 
   static toBoolWithDefault(value: string, defaultValue: boolean): boolean {
     if (value) {
-      return (/true/i).test(value);
+      return /true/i.test(value);
     }
     return defaultValue;
   }
@@ -40,12 +38,11 @@ export class AuthUtils {
       return Object.keys(obj).reduce(
         (result, key) => ({
           ...result,
-          [camelCase(key)]: AuthUtils.toCamel(obj[key]),
+          [camelCase(key)]: AuthUtils.toCamel(obj[key])
         }),
-        {},
+        {}
       );
     }
     return obj;
   }
-
 }

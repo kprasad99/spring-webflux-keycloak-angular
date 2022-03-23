@@ -1,78 +1,80 @@
 version: '3.7'
 services:
   traefik:
-    image: "traefik:v2.4"
+    image: "traefik:v2.6"
     command:
     #  - "--log.level=DEBUG"
     - "--api.insecure=true"
     - "--providers.docker=true"
     - "--providers.docker.exposedbydefault=false"
     - "--entrypoints.web.address=:80"
+    - "--entrypoints.websecure.address=:443"
     ports:
     - "80:80"
+    - "443:443"
     networks:
     - k-network
     volumes:
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
-  app-store:
-    image: kprasad99/app-store:v0.0.2
-    build: ./app-store
-    networks:
-    - k-network
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.app-store.rule=PathPrefix(`/`)"
-    - "traefik.http.routers.app-store.entrypoints=web"
-    environment: 
-      app_conf_sts_server: "http://192.168.56.121/auth/realms/universal"
-      app_conf_redirect_url: "http://192.168.56.121/app-store/"
-      app_conf_client_id: "kp_prod_appstore"
-      app_conf_response_type: "code"
-      app_conf_scope: "openid profile email"
-      app_conf_post_logout_redirect_uri: "http://192.168.56.121/app-store/#/sign-out"
-      app_conf_start_check_session: "true"
-      app_conf_silent_renew: "true"
-      app_conf_silent_renew_url: "http://192.168.56.121/app-store/assets/silent-renew.html"
-      app_conf_post_login_route: "/home"
-      app_conf_forbidden_route: "/forbidden"
-      app_conf_unauthorized_route: "/unauthorized"
-      app_conf_disable_iat_offset_validation: "true"
-  emp-app:
-    image: kprasad99/employee-app:v0.0.1
-    build: ./employee-app
-    networks:
-    - k-network
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.emp-app.rule=PathPrefix(`/emp-app`)"
-    - "traefik.http.routers.emp-app.entrypoints=web"
-    environment: 
-      app_conf_sts_server: "http://192.168.56.121/auth/realms/universal"
-      app_conf_redirect_url: "http://192.168.56.121/emp-app/"
-      app_conf_client_id: "kp_prod_app1"
-      app_conf_response_type: "code"
-      app_conf_scope: "openid profile email"
-      app_conf_post_logout_redirect_uri: "http://192.168.56.121/emp-app/#/sign-out"
-      app_conf_start_check_session: "true"
-      app_conf_silent_renew: "true"
-      app_conf_silent_renew_url: "http://192.168.56.121/emp-app/assets/silent-renew.html"
-      app_conf_post_login_route: "/home"
-      app_conf_forbidden_route: "/forbidden"
-      app_conf_unauthorized_route: "/unauthorized"
-      app_conf_disable_iat_offset_validation: "true"
-  employee-backend:
-    image: kprasad99/employee-backend:v0.0.1
-    build: ./employee-backend
-    networks:
-    - k-network
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.employee-backend.rule=PathPrefix(`/api`)"
-    - "traefik.http.routers.employee-backend.entrypoints=web"
-    environment: 
-      spring.security.oauth2.resourceserver.jwt.issuer-uri: http://192.168.56.121/auth/realms/universal
+  # app-store:
+  #   image: kprasad99/app-store:v0.1.0
+  #   build: ./app-store
+  #   networks:
+  #   - k-network
+  #   labels:
+  #   - "traefik.enable=true"
+  #   - "traefik.http.routers.app-store.rule=PathPrefix(`/`)"
+  #   - "traefik.http.routers.app-store.entrypoints=web"
+  #   environment: 
+  #     app_conf_sts_server: "http://192.168.56.121/auth/realms/universal"
+  #     app_conf_redirect_url: "http://192.168.56.121/app-store/"
+  #     app_conf_client_id: "kp_prod_appstore"
+  #     app_conf_response_type: "code"
+  #     app_conf_scope: "openid profile email"
+  #     app_conf_post_logout_redirect_uri: "http://192.168.56.121/app-store/#/sign-out"
+  #     app_conf_start_check_session: "true"
+  #     app_conf_silent_renew: "true"
+  #     app_conf_silent_renew_url: "http://192.168.56.121/app-store/assets/silent-renew.html"
+  #     app_conf_post_login_route: "/home"
+  #     app_conf_forbidden_route: "/forbidden"
+  #     app_conf_unauthorized_route: "/unauthorized"
+  #     app_conf_disable_iat_offset_validation: "true"
+  # emp-app:
+  #   image: kprasad99/employee-app:v0.1.0
+  #   build: ./employee-app
+  #   networks:
+  #   - k-network
+  #   labels:
+  #   - "traefik.enable=true"
+  #   - "traefik.http.routers.emp-app.rule=PathPrefix(`/emp-app`)"
+  #   - "traefik.http.routers.emp-app.entrypoints=web"
+  #   environment: 
+  #     app_conf_sts_server: "http://192.168.56.121/auth/realms/universal"
+  #     app_conf_redirect_url: "http://192.168.56.121/emp-app/"
+  #     app_conf_client_id: "kp_prod_app1"
+  #     app_conf_response_type: "code"
+  #     app_conf_scope: "openid profile email"
+  #     app_conf_post_logout_redirect_uri: "http://192.168.56.121/emp-app/#/sign-out"
+  #     app_conf_start_check_session: "true"
+  #     app_conf_silent_renew: "true"
+  #     app_conf_silent_renew_url: "http://192.168.56.121/emp-app/assets/silent-renew.html"
+  #     app_conf_post_login_route: "/home"
+  #     app_conf_forbidden_route: "/forbidden"
+  #     app_conf_unauthorized_route: "/unauthorized"
+  #     app_conf_disable_iat_offset_validation: "true"
+  # employee-backend:
+  #   image: kprasad99/employee-backend:v0.1.0
+  #   build: ./employee-backend
+  #   networks:
+  #   - k-network
+  #   labels:
+  #   - "traefik.enable=true"
+  #   - "traefik.http.routers.employee-backend.rule=PathPrefix(`/api`)"
+  #   - "traefik.http.routers.employee-backend.entrypoints=web"
+  #   environment: 
+  #     spring.security.oauth2.resourceserver.jwt.issuer-uri: http://192.168.56.121/auth/realms/universal
   keycloak:
-    image: jboss/keycloak:12.0.4
+    image: quay.io/keycloak/keycloak:16.1.0
     networks:
     - k-network
     ports:
@@ -81,12 +83,22 @@ services:
     - ${PWD}/keycloak/universal-realm.json:/tmp/universal-realm.json
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.rule=PathPrefix(`/auth`)"
-      - "traefik.http.routers.keycloak.entrypoints=web"
+      - "traefik.http.routers.web.rule=PathPrefix(`/auth`)"
+      # http with redirection
+      - traefik.http.middlewares.redirect-middleware.redirectscheme.scheme=https
+      - traefik.http.routers.web.entrypoints=web
+      #- traefik.http.routers.web-router.rule=Host(`auth.kp.local`)
+      - traefik.http.routers.web.middlewares=redirect-middleware
+      # https
+      - "traefik.http.routers.websecure.rule=PathPrefix(`/auth`)"
+      - traefik.http.routers.websecure.entrypoints=websecure
+      - traefik.http.routers.websecure.tls=true
+      #- traefik.http.routers.websecure.rule=Host(`auth.kp.local`)
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: password
       KEYCLOAK_IMPORT: /tmp/universal-realm.json
+      PROXY_ADDRESS_FORWARDING: "true"
       DB_VENDOR: h2
 #      DB_VENDOR: mysql
 #      DB_DATABASE: keycloak

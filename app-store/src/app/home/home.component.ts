@@ -1,25 +1,30 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { EventTypes, OidcSecurityService, PublicEventsService } from 'angular-auth-oidc-client';
+
+import { HttpClient } from '@angular/common/http';
+
+import { Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'k-home',
+  selector: 'kp-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
+  user!: string;
+  apps: any = [];
 
-  user: string;
-  apps = [];
-
-  constructor(public http: HttpClient, public router: Router, public oidcSecurityService: OidcSecurityService,
-              private eventService: PublicEventsService) { }
+  constructor(
+    public http: HttpClient,
+    public router: Router,
+    public oidcSecurityService: OidcSecurityService,
+    private eventService: PublicEventsService
+  ) {}
 
   ngOnInit(): void {
-    this.oidcSecurityService.userData$.pipe(filter(Boolean)).subscribe((v: any) => this.user = v.preferred_username);
-    this.http.get('./assets/apps.json').subscribe(v => this.apps = v as any);
+    this.oidcSecurityService.userData$.pipe(filter(v => v && v.userData)).subscribe(v => (this.user = v.userData.name));
+    this.http.get('./assets/apps.json').subscribe(v => (this.apps = v as any));
     setTimeout(() => {
       this.eventService
         .registerForEvents()
@@ -33,12 +38,10 @@ export class HomeComponent implements OnInit {
           }
         });
     }, 5 * 1000);
-
+    this.apps = [];
   }
 
   logout(): void {
-    console.log('start logoff');
     this.oidcSecurityService.logoff();
   }
-
 }

@@ -1,12 +1,12 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.5'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'org.springframework.boot' version "${springBootVersion}"
+	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
 	id 'java'
 }
 
 group = 'io.github.kprasad99'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+version = '0.1.0-SNAPSHOT'
+sourceCompatibility = '17'
 
 configurations {
 	compileOnly {
@@ -18,12 +18,10 @@ configurations {
 }
 
 repositories {
+	mavenLocal()
 	mavenCentral()
 }
 
-ext {
-	set('springCloudVersion', "2020.0.2")
-}
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -57,8 +55,9 @@ bootRun {
 }
 
 bootJar {
-    enabled = true
-    layered()
+    layered {
+		enabled = true
+	}
 }
 
 test {

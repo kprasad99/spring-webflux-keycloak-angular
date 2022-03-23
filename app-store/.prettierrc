@@ -1,0 +1,12 @@
+{
+  "arrow-body-style": "off",
+  "prefer-arrow-callback": "off",
+  "printWidth": 120,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "endOfLine": "auto",
+  "useTabs": false,
+  "bracketSameLine": true,
+  "arrowParens": "avoid",
+  "bracketSpacing": true
+}
