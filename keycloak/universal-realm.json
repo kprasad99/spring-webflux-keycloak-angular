@@ -725,18 +725,18 @@
             "clientId": "kp_app1",
             "name": "Application 1",
             "description": "A Sample Application One",
-            "rootUrl": "http://192.168.56.121:4201/",
-            "adminUrl": "http://192.168.56.121:4201/",
+            "rootUrl": "https://192.168.56.121:4201/",
+            "adminUrl": "https://192.168.56.121:4201/",
             "surrogateAuthRequired": false,
             "enabled": true,
             "alwaysDisplayInConsole": false,
             "clientAuthenticatorType": "client-secret",
             "secret": "123456789",
             "redirectUris": [
-                "http://192.168.56.121:4201/*"
+                "https://192.168.56.121:4201/*"
             ],
             "webOrigins": [
-                "http://192.168.56.121:4201",
+                "https://192.168.56.121:4201",
                 "+"
             ],
             "notBefore": 0,
@@ -803,15 +803,15 @@
             "clientId": "kp_prod_app1",
             "name": "Application 1",
             "description": "A Sample Application One",
-            "rootUrl": "http://192.168.56.121/emp-app",
-            "adminUrl": "http://192.168.56.121/emp-app",
+            "rootUrl": "https://192.168.56.121/emp-app",
+            "adminUrl": "https://192.168.56.121/emp-app",
             "surrogateAuthRequired": false,
             "enabled": true,
             "alwaysDisplayInConsole": false,
             "clientAuthenticatorType": "client-secret",
             "secret": "123456789",
             "redirectUris": [
-                "http://192.168.56.121/emp-app/*"
+                "https://192.168.56.121/emp-app/*"
             ],
             "webOrigins": [
                 "+"
@@ -878,18 +878,18 @@
         {
             "id": "abc117c5-1bd8-4b8f-9fdb-2d6ab8a50c51",
             "clientId": "kp_appstore",
-            "rootUrl": "http://192.168.56.121:4200",
-            "adminUrl": "http://192.168.56.121:4200",
+            "rootUrl": "https://192.168.56.121:4200",
+            "adminUrl": "https://192.168.56.121:4200",
             "surrogateAuthRequired": false,
             "enabled": true,
             "alwaysDisplayInConsole": false,
             "clientAuthenticatorType": "client-secret",
             "secret": "123456789",
             "redirectUris": [
-                "http://192.168.56.121:4200/*"
+                "https://192.168.56.121:4200/*"
             ],
             "webOrigins": [
-                "http://192.168.56.121:4200",
+                "https://192.168.56.121:4200",
                 "+"
             ],
             "notBefore": 0,
@@ -954,18 +954,18 @@
         {
             "id": "abc117c5-1bd8-4b8f-9fdb-2d6ab8a50c5d",
             "clientId": "kp_prod_appstore",
-            "rootUrl": "http://192.168.56.121/app-store",
-            "adminUrl": "http://192.168.56.121/app-store",
+            "rootUrl": "https://192.168.56.121/app-store",
+            "adminUrl": "https://192.168.56.121/app-store",
             "surrogateAuthRequired": false,
             "enabled": true,
             "alwaysDisplayInConsole": false,
             "clientAuthenticatorType": "client-secret",
             "secret": "123456789",
             "redirectUris": [
-                "http://192.168.56.121/app-store/*"
+                "https://192.168.56.121/app-store/*"
             ],
             "webOrigins": [
-                "http://192.168.56.121/app-store",
+                "https://192.168.56.121/app-store",
                 "+"
             ],
             "notBefore": 0,
