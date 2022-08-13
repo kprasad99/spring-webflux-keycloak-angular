@@ -1,31 +1,27 @@
 <h2 mat-dialog-title>Add Employee</h2>
 <form [formGroup]="empForm" class="emp-form">
-    <mat-dialog-content class="mat-typography">
+  <mat-dialog-content class="mat-typography">
+    <mat-form-field class="emp-field-full-width">
+      <input matInput placeholder="First Name" formControlName="firstName" />
+      <mat-error *ngIf="empForm.controls['firstName'].hasError('required')">
+        First Name is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
 
-        <mat-form-field class="emp-field-full-width">
-            <input matInput placeholder="First Name" formControlName="firstName">
-            <mat-error *ngIf="empForm.controls['firstName'].hasError('required')">
-                First Name is <strong>required</strong>
-            </mat-error>
-        </mat-form-field>
+    <mat-form-field class="emp-field-full-width">
+      <input matInput placeholder="Last Name" formControlName="lastName" />
+      <mat-error *ngIf="empForm.controls['lastName'].hasError('required')">
+        Last Name is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
 
-        <mat-form-field class="emp-field-full-width">
-            <input matInput placeholder="Last Name" formControlName="lastName">
-            <mat-error *ngIf="empForm.controls['lastName'].hasError('required')">
-                Last Name is <strong>required</strong>
-            </mat-error>
-        </mat-form-field>
-
-        <mat-form-field class="emp-field-full-width">
-            <input matInput placeholder="Age" type="number" formControlName="age">
-            <mat-error *ngIf="empForm.controls['age'].hasError('required')">
-                Age is <strong>required</strong>
-            </mat-error>
-        </mat-form-field>
-
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Cancel</button>
-        <button mat-button [mat-dialog-close]="this.empForm.value" cdkFocusInitial>Save</button>
-    </mat-dialog-actions>
+    <mat-form-field class="emp-field-full-width">
+      <input matInput placeholder="Age" type="number" formControlName="age" />
+      <mat-error *ngIf="empForm.controls['age'].hasError('required')"> Age is <strong>required</strong> </mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button [mat-dialog-close]="this.empForm.value" cdkFocusInitial>Save</button>
+  </mat-dialog-actions>
 </form>

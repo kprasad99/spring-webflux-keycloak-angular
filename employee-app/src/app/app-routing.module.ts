@@ -6,7 +6,6 @@ import { AutoLoginAllRoutesGuard, AutoLoginPartialRoutesGuard } from 'angular-au
 
 import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { SignOutComponent } from './sign-out/sign-out.component';
-import { SsoComponent } from './sso/sso.component';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 
 const routes: Routes = [
@@ -26,21 +25,15 @@ const routes: Routes = [
     component: UnauthorizedComponent
   },
   {
-    path: 'sso',
-    pathMatch: 'full',
-    component: SsoComponent,
-    canActivate: [AutoLoginPartialRoutesGuard]
-  },
-
-  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'home'
-  },  {
+  },
+  {
     path: 'home',
     pathMatch: 'full',
     loadChildren: () => import('./home/home.module').then(m => m.HomeModule),
-     canLoad: [AutoLoginAllRoutesGuard]
+    canLoad: [AutoLoginAllRoutesGuard]
   }
 ];
 

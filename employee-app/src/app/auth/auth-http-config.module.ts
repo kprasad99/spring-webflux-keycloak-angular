@@ -1,5 +1,4 @@
-import { AuthModule, LogLevel, StsConfigHttpLoader, StsConfigLoader } from 'angular-auth-oidc-client';
-
+import { AuthModule, StsConfigHttpLoader, StsConfigLoader } from 'angular-auth-oidc-client';
 import { HttpClient } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { map } from 'rxjs/operators';
@@ -10,39 +9,51 @@ import { environment } from 'src/environments/environment';
 export const httpLoaderFactory = (httpClient: HttpClient) => {
   const config$ = httpClient.get<any>(environment.oidc_url).pipe(
     map(v => AuthUtils.toCamel(v)),
+
     map((customConfig: any) => {
       const generateUrl = AuthUtils.toBoolWithDefault(customConfig.generateUrl, false);
       let baseUrl: any;
+
       if (customConfig.baseUrl) {
-        baseUrl = AuthUtils.suffixUrl(customConfig.baseUrl, customConfig.appName);
+        baseUrl = customConfig.baseUrl;
       } else if (generateUrl) {
-        baseUrl = AuthUtils.suffixUrl(customConfig.baseUrl, customConfig.appName);
+        baseUrl = AuthUtils.generateBaseUrl();
       }
+
+      let redirectPath = window.location.hash;
+      if (redirectPath.endsWith('sign-out') || redirectPath.endsWith('forbidden')) {
+        redirectPath = '#/home';
+      }
+
       return {
         authority: customConfig.authority,
-        triggerAuthorizationResultEvent: AuthUtils.toBoolWithDefault(
-          customConfig.triggerAuthorizationResultEvent,
-          false
-        ),
-        redirectUrl: AuthUtils.withDefault(customConfig.redirectUrl, baseUrl),
+        redirectUrl: AuthUtils.withDefault(customConfig.redirectUrl, AuthUtils.suffixUrl(baseUrl, redirectPath)),
         clientId: customConfig.clientId,
         responseType: customConfig.responseType,
         scope: customConfig.scope,
-        postLogoutRedirectUri: customConfig.postLogoutRedirectUri,
+        postLogoutRedirectUri: AuthUtils.withDefault(
+          customConfig.postLogoutRedirectUri,
+          AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.postLogoutPath, '#/sign-out'))
+        ),
         startCheckSession: AuthUtils.toBoolWithDefault(customConfig.startCheckSession, false),
         silentRenew: AuthUtils.toBoolWithDefault(customConfig.silentRenew, false),
-        silentRenewUrl: customConfig.silentRenewUrl,
-        postLoginRoute: AuthUtils.withDefault(customConfig.postLoginRoute, '/home'),
+        silentRenewUrl: AuthUtils.withDefault(
+          customConfig.silentRenewUrl,
+          AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.slientRenewPath, 'silent-renew.html'))
+        ),
+        postLoginRoute: AuthUtils.withDefault(customConfig.startupRoute, '/home/user'),
         forbiddenRoute: AuthUtils.withDefault(customConfig.forbiddenRoute, '/forbidden'),
         unauthorizedRoute: AuthUtils.withDefault(customConfig.unauthorizedRoute, '/unauthorized'),
-        logLevel: LogLevel.None, // LogLevel.Debug,
+        useRefreshToken: AuthUtils.toBoolWithDefault(customConfig.useRefreshToken, false),
+        triggerAuthorizationResultEvent: true,
+        logLevel: AuthUtils.toIntWithDefault(customConfig.logLevel, 0), // LogLevel.Debug,
         maxIdTokenIatOffsetAllowedInSeconds: AuthUtils.toIntWithDefault(
           customConfig.maxIdTokenIatOffsetAllowedInSeconds,
-          60
+          40
         ),
-        disableIatOffsetValidation: AuthUtils.toBoolWithDefault(customConfig.disableIatOffsetValidation, false),
-        historyCleanupOff: AuthUtils.toBoolWithDefault(customConfig.historyCleanupOff, true),
-        autoUserInfo: AuthUtils.toBoolWithDefault(customConfig.autoUserInfo, true)
+        historyCleanupOff: AuthUtils.toBoolWithDefault(customConfig.historyCleanupOff, false),
+        autoUserinfo: AuthUtils.toBoolWithDefault(customConfig.autoUserinfo, true),
+        disableIatOffsetValidation: AuthUtils.toBoolWithDefault(customConfig.disableIatOffsetValidation, false)
       };
     })
   );

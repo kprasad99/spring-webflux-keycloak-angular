@@ -6,7 +6,7 @@ export class AuthUtils {
   }
 
   static toIntWithDefault(value: string, defaultValue: number): number {
-    return value ? +defaultValue : 0;
+    return value ? +value : defaultValue;
   }
 
   static toBoolWithDefault(value: string, defaultValue: boolean): boolean {
@@ -44,5 +44,13 @@ export class AuthUtils {
       );
     }
     return obj;
+  }
+
+  static generateBaseUrl() {
+    let url = window.location.href;
+    let queryParam = window.location.search;
+    queryParam = queryParam.replace('/\\?$/', '');
+    const withoutHash = window.location.href.replace(window.location.hash, '');
+    return withoutHash.replace(queryParam, '');
   }
 }

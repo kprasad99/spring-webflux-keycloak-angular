@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   traefik:
-    image: "traefik:v2.6"
+    image: "traefik:v2.8"
     command:
     #  - "--log.level=DEBUG"
     - "--api.insecure=true"
@@ -74,13 +74,18 @@ services:
   #   environment: 
   #     spring.security.oauth2.resourceserver.jwt.issuer-uri: http://192.168.56.121/auth/realms/universal
   keycloak:
-    image: quay.io/keycloak/keycloak:16.1.0
+    image: quay.io/keycloak/keycloak:19.0.1
     networks:
     - k-network
     ports:
     - 18080:8080
     volumes: 
-    - ${PWD}/keycloak/universal-realm.json:/tmp/universal-realm.json
+    - ./conf/keycloak:/opt/keycloak/data/import:z
+    command:
+      - start
+      - --import-realm
+      #- --optimized
+      #- --auto-build
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.web.rule=PathPrefix(`/auth`)"
@@ -95,24 +100,37 @@ services:
       - traefik.http.routers.websecure.tls=true
       #- traefik.http.routers.websecure.rule=Host(`auth.kp.local`)
     environment:
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: password
-      KEYCLOAK_IMPORT: /tmp/universal-realm.json
+      # https://www.keycloak.org/migration/migrating-to-quarkus
+      # https://www.keycloak.org/server/containers
       PROXY_ADDRESS_FORWARDING: "true"
-      DB_VENDOR: h2
-#      DB_VENDOR: mysql
-#      DB_DATABASE: keycloak
-#      DB_USER: keycloak
-#      DB_PASSWORD: password
-#  mysql:
-#    image: mysql
-#    networks:
-#    - k-network
-#    environment:
-#       MYSQL_ROOT_PASSWORD: password
-#       MYSQL_DATABASE: keycloak
-#       MYSQL_USER: keycloak
-#       MYSQL_PASSWORD: password
-
+      KC_HTTP_RELATIVE_PATH: "/auth"
+      KC_PROXY: edge
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      # don't set hostname else https://github.com/keycloak/keycloak/discussions/12466#discussioncomment-2964624
+      # KC_HOSTNAME: "keycloak" 
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+      # https://www.keycloak.org/server/features
+      #KC_FEATURES:  "authorization,token-exchange,scripts,admin2,account2"
+      KC_FEATURES:  "authorization,token-exchange,scripts,admin2,account2"
+      #KC_FEATURES_DISABLED: "admin2"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+  postgres:
+    image: postgres:14-alpine3.16
+    networks:
+    - k-network
+    environment:
+      POSTGRES_PASSWORD: password
+      #PGDATA: /var/lib/postgresql/data/pgdata 
+    volumes:
+    - ./conf/postgres/keycloak-init.sh:/docker-entrypoint-initdb.d/keycloak-init.sh
+    #- ./.data/postgres:/var/lib/postgresql/data
 networks:
   k-network:

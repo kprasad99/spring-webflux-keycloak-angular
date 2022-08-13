@@ -5,7 +5,6 @@ import { NgModule } from '@angular/core';
 import { AutoLoginAllRoutesGuard, AutoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { SignOutComponent } from './sign-out/sign-out.component';
-import { SsoComponent } from './sso/sso.component';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 
 const routes: Routes = [

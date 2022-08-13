@@ -1,7 +1,7 @@
 # FROM openjdk:17-jre-slim
 # FROM amazoncorretto:17
 
-FROM alpine:3.15 as jvmBuilder
+FROM alpine:3.16 as jvmBuilder
 
 RUN apk --no-cache add openjdk17-jdk openjdk17-jmods
 
@@ -38,7 +38,7 @@ RUN gradle build \
     -jar build/libs/*.jar extract \
     --destination /app
 
-FROM alpine:3.15
+FROM alpine:3.16
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH="$PATH:$JAVA_HOME/bin"
