@@ -11,7 +11,7 @@ const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-   canActivate: [AutoLoginAllRoutesGuard],
+    canActivate: [AutoLoginAllRoutesGuard],
     children: [
       {
         path: '',

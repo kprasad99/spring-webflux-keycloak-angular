@@ -13,27 +13,26 @@ import { AppRoutingModule } from './app-routing.module';
 import { AuthHttpConfigModule } from './auth/auth-http-config.module';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { SignOutComponent } from './sign-out/sign-out.component';
-import { SsoComponent } from './sso/sso.component';
 import { TokenInterceptor } from './token.interceptor';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { environment } from '../environments/environment';
 
 @NgModule({
-  declarations: [AppComponent, SsoComponent, SignOutComponent, ForbiddenComponent, UnauthorizedComponent],
+  declarations: [AppComponent, SignOutComponent, ForbiddenComponent, UnauthorizedComponent],
   imports: [
     BrowserModule,
     FlexLayoutModule,
     HttpClientModule,
     MatProgressSpinnerModule,
     AppRoutingModule,
-    BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       // Register the ServiceWorker as soon as the app is stable
       // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000'
     }),
-    AuthHttpConfigModule
+    AuthHttpConfigModule,
+    BrowserAnimationsModule
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
   bootstrap: [AppComponent]

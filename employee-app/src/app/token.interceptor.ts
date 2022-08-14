@@ -2,25 +2,41 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 
 import { Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { Observable, catchError, defaultIfEmpty, map, switchMap } from 'rxjs';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
+  paths = ['/api'];
+
   constructor(private oidc: OidcSecurityService) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    let token!: string;
-    try {
-      token = this.oidc.getAccessToken();
-    } catch (err) {}
-    if (token && request.url.trim().startsWith('/api')) {
-      const tokenValue = `Bearer ${token}`;
-      request = request.clone({
-        setHeaders: {
-          Authorization: tokenValue
-        }
-      });
+    let matches = false;
+
+    for (const str of this.paths) {
+      if (request.url.startsWith(str)) {
+        matches = true;
+        break;
+      }
+    }
+    if (matches) {
+      return this.oidc.getAccessToken().pipe(
+        defaultIfEmpty(''),
+        catchError(() => ''),
+        map((v: string) => {
+          if (v) {
+            const tokenValue = `Bearer ${v}`;
+            return request.clone({
+              setHeaders: {
+                Authorization: tokenValue
+              }
+            });
+          }
+          return request;
+        }),
+        switchMap(req => next.handle(req))
+      );
     }
     return next.handle(request);
   }

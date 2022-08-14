@@ -1,4 +1,4 @@
-import { camelCase } from 'lodash';
+import { camelCase } from 'lodash-es';
 
 export class AuthUtils {
   static toInt(value: string): number {
@@ -44,5 +44,13 @@ export class AuthUtils {
       );
     }
     return obj;
+  }
+
+  static generateBaseUrl() {
+    let url = window.location.href;
+    let queryParam = window.location.search;
+    queryParam = queryParam.replace('/\\?$/', '');
+    const withoutHash = window.location.href.replace(window.location.hash, '');
+    return withoutHash.replace(queryParam, '');
   }
 }

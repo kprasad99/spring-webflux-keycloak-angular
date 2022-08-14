@@ -10,14 +10,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AuthHttpConfigModule } from './auth/auth-http-config.module';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { SignOutComponent } from './sign-out/sign-out.component';
-import { SsoComponent } from './sso/sso.component';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { environment } from '../environments/environment';
 
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
-  declarations: [AppComponent, SsoComponent, SignOutComponent, UnauthorizedComponent, ForbiddenComponent],
+  declarations: [AppComponent, SignOutComponent, UnauthorizedComponent, ForbiddenComponent],
   imports: [
     BrowserModule,
     FlexLayoutModule,
@@ -26,7 +25,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
-      // Register the ServiceWorker as soon as the app is stable
+      // Register the ServiceWorker as soon as the application is stable
       // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000'
     }),
