@@ -1,4 +1,4 @@
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
@@ -19,10 +19,10 @@ import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent, SignOutComponent, ForbiddenComponent, UnauthorizedComponent],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
     FlexLayoutModule,
-    HttpClientModule,
     MatProgressSpinnerModule,
     AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
@@ -34,7 +34,9 @@ import { environment } from '../environments/environment';
     AuthHttpConfigModule,
     BrowserAnimationsModule
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
-  bootstrap: [AppComponent]
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+    provideHttpClient(withInterceptorsFromDi())
+  ]
 })
 export class AppModule {}

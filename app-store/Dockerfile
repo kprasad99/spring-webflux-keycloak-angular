@@ -1,11 +1,13 @@
-
-FROM        golang:1.19-alpine as builder
+FROM        golang:1.22-alpine3.20 AS builder
 WORKDIR     /usr/src/go-web
-COPY        main.go /usr/src/go-web/main.go
 COPY        go.mod /usr/src/go-web/go.mod
-RUN         CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -v
+COPY        go.sum /usr/src/go-web/go.sum
+RUN         go mod download
+COPY        main.go /usr/src/go-web/main.go
+RUN         CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a
 
-FROM        node:16-alpine3.16 as nmpBuilder
+
+FROM        node:20-alpine3.20 AS nmpBuilder
 WORKDIR     /opt/workspace
 COPY        package.json .
 COPY        package-lock.json .

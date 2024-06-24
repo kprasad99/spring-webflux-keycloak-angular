@@ -15,12 +15,15 @@
       "prefix": "kp",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/employee-app",
+            "outputPath": {
+              "base": "dist/employee-app"
+            },
             "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -34,8 +37,8 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "serviceWorker": true,
-            "ngswConfigPath": "ngsw-config.json"
+            "serviceWorker": "ngsw-config.json",
+            "browser": "src/main.ts"
           },
           "configurations": {
             "production": {
@@ -60,9 +63,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -74,12 +75,12 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "employee-app:build:production",
-              "proxyConfig": "proxy-config.json"
+              "proxyConfig": "proxy-config.json",
+              "buildTarget": "employee-app:build:production"
             },
             "development": {
-              "browserTarget": "employee-app:build:development",
-              "proxyConfig": "proxy-config.json"
+              "proxyConfig": "proxy-config.json",
+              "buildTarget": "employee-app:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -87,7 +88,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "employee-app:build"
+            "buildTarget": "employee-app:build"
           }
         },
         "test": {
@@ -149,13 +150,38 @@
               "devServerTarget": "employee-app:serve:production"
             }
           }
+        },
+        "ct": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "employee-app:serve",
+            "watch": true,
+            "headless": false,
+            "testingType": "component"
+          },
+          "configurations": {
+            "development": {
+              "devServerTarget": "employee-app:serve:development"
+            }
+          }
         }
       }
     }
   },
   "cli": {
+    "packageManager": "pnpm",
     "schematicCollections": [
-      "@angular-eslint/schematics"
+      "@cypress/schematic",
+      "@angular-eslint/schematics",
+      "@schematics/angular"
     ]
+  },
+  "schematics": {
+    "@angular-eslint/schematics:application": {
+      "setParserOptionsProject": true
+    },
+    "@angular-eslint/schematics:library": {
+      "setParserOptionsProject": true
+    }
   }
 }

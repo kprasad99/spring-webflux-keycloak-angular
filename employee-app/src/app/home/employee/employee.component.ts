@@ -32,7 +32,11 @@ export class EmployeeComponent implements OnInit {
   selection = new SelectionModel<Employee>(true, []);
   userData: any = {};
 
-  constructor(private auth: OidcSecurityService, private empService: EmployeeService, public dialog: MatDialog) {}
+  constructor(
+    private auth: OidcSecurityService,
+    private empService: EmployeeService,
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.auth.userData$.subscribe(e => {

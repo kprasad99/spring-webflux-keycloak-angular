@@ -1,7 +1,9 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { HttpClientModule } from '@angular/common/http';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgModule } from '@angular/core';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
@@ -13,14 +15,12 @@ import { SignOutComponent } from './sign-out/sign-out.component';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { environment } from '../environments/environment';
 
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
 @NgModule({
   declarations: [AppComponent, SignOutComponent, UnauthorizedComponent, ForbiddenComponent],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
     FlexLayoutModule,
-    HttpClientModule,
     MatProgressSpinnerModule,
     AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
@@ -32,7 +32,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     BrowserAnimationsModule,
     AuthHttpConfigModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppModule {}
