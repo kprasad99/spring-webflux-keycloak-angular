@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  oidc_url: '/assets/oidc.json'
+  oidc_url: './assets/oidc.json'
 };
 
 /*

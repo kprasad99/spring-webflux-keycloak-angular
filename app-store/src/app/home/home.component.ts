@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit {
       .subscribe(value => {
         console.log('Session changed event receieved ', value);
         if (value && value.value === 'changed') {
-          this.oidcSecurityService.logoff().subscribe(result => this.router.navigateByUrl('/sign-out'));
+          this.oidcSecurityService.logoff().subscribe(() => this.router.navigateByUrl('/sign-out'));
         }
       });
     this.apps = [];

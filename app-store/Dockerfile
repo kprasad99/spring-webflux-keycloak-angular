@@ -17,7 +17,7 @@ COPY package.json /workspace/package.json
 RUN pnpm install
 
 #COPY . /workspace
-COPY .eslintrc.json /workspace/.eslintrc.json
+COPY eslint.config.js /workspace/eslint.config.js
 COPY ngsw-config.json /workspace/ngsw-config.json
 COPY tsconfig.app.json /workspace/tsconfig.app.json
 COPY tsconfig.json /workspace/tsconfig.json

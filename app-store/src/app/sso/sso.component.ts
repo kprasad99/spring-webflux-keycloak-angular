@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'kp-sso',
   templateUrl: './sso.component.html',
-  styleUrl: './sso.component.css'
+  styleUrl: './sso.component.scss'
 })
 export class SsoComponent implements OnInit {
   constructor(
@@ -16,11 +16,11 @@ export class SsoComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.oidcSecurityService.checkAuthIncludingServer().subscribe(({ configId, isAuthenticated }) => {
+    this.oidcSecurityService.checkAuthIncludingServer().subscribe(({ isAuthenticated }) => {
       if (isAuthenticated) {
-        this.router.navigateByUrl(this.storageService.read('redirect') || '/home');
+        this.router.navigateByUrl(this.storageService.read('redirect') ?? '/home');
       } else {
-        //  this.oidcSecurityService.authorize();
+        this.oidcSecurityService.authorize();
       }
     });
   }

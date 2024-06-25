@@ -47,7 +47,7 @@ export class AuthUtils {
   }
 
   static generateBaseUrl() {
-    let url = window.location.href;
+    const url = window.location.href;
     let queryParam = window.location.search;
     queryParam = queryParam.replace('/\\?$/', '');
     const withoutHash = url.replace(window.location.hash, '');
