@@ -28,7 +28,7 @@ export class AuthUtils {
   }
 
   static withDefault(value: string, defaultValue: string): string {
-    return value ? value : defaultValue;
+    return value || defaultValue;
   }
 
   static toCamel(obj: any): any {
@@ -50,7 +50,7 @@ export class AuthUtils {
     let url = window.location.href;
     let queryParam = window.location.search;
     queryParam = queryParam.replace('/\\?$/', '');
-    const withoutHash = window.location.href.replace(window.location.hash, '');
+    const withoutHash = url.replace(window.location.hash, '');
     return withoutHash.replace(queryParam, '');
   }
 }

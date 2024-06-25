@@ -12,11 +12,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AuthHttpConfigModule } from './auth/auth-http-config.module';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { SignOutComponent } from './sign-out/sign-out.component';
+import { SsoComponent } from './sso/sso.component';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { environment } from '../environments/environment';
 
 @NgModule({
-  declarations: [AppComponent, SignOutComponent, UnauthorizedComponent, ForbiddenComponent],
+  declarations: [AppComponent, SignOutComponent, UnauthorizedComponent, ForbiddenComponent, SsoComponent],
   bootstrap: [AppComponent],
   imports: [
     BrowserModule,

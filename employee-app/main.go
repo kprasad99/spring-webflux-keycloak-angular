@@ -54,9 +54,12 @@ func main() {
 
 	app.Static(contextPath, "/static")
 	if contextPath != "" {
+		app.Get(strings.TrimSuffix(contextPath, "/")+"/conf", getConf)
 		app.Get("/", func(ctx *fiber.Ctx) error {
-			return ctx.SendFile("/static/index.html")
+			return ctx.Redirect(strings.TrimSuffix(contextPath, "/") + "/index.html")
 		})
+	} else {
+		app.Get("/conf", getConf)
 	}
 
 	log.Println("Started web server")

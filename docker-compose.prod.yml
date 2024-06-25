@@ -1,0 +1,6 @@
+services:
+  employee-backend:
+    image: kprasad99/employee-backend:1.0.0
+    build:
+      context: ./employee-backend
+      dockerfile: Dockerfile.native

@@ -1,4 +1,10 @@
-import { AuthModule, StsConfigHttpLoader, StsConfigLoader } from 'angular-auth-oidc-client';
+import {
+  AbstractSecurityStorage,
+  AuthModule,
+  DefaultLocalStorageService,
+  StsConfigHttpLoader,
+  StsConfigLoader
+} from 'angular-auth-oidc-client';
 import { HttpClient } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { map } from 'rxjs/operators';
@@ -33,7 +39,7 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
         scope: customConfig.scope,
         postLogoutRedirectUri: AuthUtils.withDefault(
           customConfig.postLogoutRedirectUri,
-          AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.postLogoutPath, '#/sign-out'))
+          AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.postLogoutPath, '/sign-out'))
         ),
         startCheckSession: AuthUtils.toBoolWithDefault(customConfig.startCheckSession, false),
         silentRenew: AuthUtils.toBoolWithDefault(customConfig.silentRenew, false),
@@ -41,10 +47,15 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
           customConfig.silentRenewUrl,
           AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.slientRenewPath, 'silent-renew.html'))
         ),
-        postLoginRoute: AuthUtils.withDefault(customConfig.startupRoute, '/home/user'),
+        postLoginRoute: AuthUtils.withDefault(customConfig.startupRoute, '/home'),
         forbiddenRoute: AuthUtils.withDefault(customConfig.forbiddenRoute, '/forbidden'),
         unauthorizedRoute: AuthUtils.withDefault(customConfig.unauthorizedRoute, '/unauthorized'),
         useRefreshToken: AuthUtils.toBoolWithDefault(customConfig.useRefreshToken, false),
+        ignoreNonceAfterRefresh: AuthUtils.toBoolWithDefault(customConfig.ignoreNonceAfterRefresh, true), // this is required if the id_token is not returned
+        triggerRefreshWhenIdTokenExpired: AuthUtils.toBoolWithDefault(
+          customConfig.triggerRefreshWhenIdTokenExpired,
+          false
+        ), // required when refreshing the browser if id_token is not updated after the first authentication
         triggerAuthorizationResultEvent: true,
         logLevel: AuthUtils.toIntWithDefault(customConfig.logLevel, 0), // LogLevel.Debug,
         maxIdTokenIatOffsetAllowedInSeconds: AuthUtils.toIntWithDefault(
@@ -71,6 +82,7 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
       }
     })
   ],
+  //  providers: [{ provide: AbstractSecurityStorage, useClass: DefaultLocalStorageService }],
   exports: [AuthModule]
 })
 export class AuthHttpConfigModule {}
