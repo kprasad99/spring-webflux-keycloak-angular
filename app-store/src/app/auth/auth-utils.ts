@@ -18,11 +18,7 @@ export class AuthUtils {
 
   static suffixUrl(value: string, suffix: string): string {
     if (value && suffix) {
-      if (value.endsWith('/')) {
-        return value + suffix;
-      } else {
-        return value + '/' + suffix;
-      }
+      return value.endsWith('/') ? value + suffix : value + '/' + suffix;
     }
     return value;
   }

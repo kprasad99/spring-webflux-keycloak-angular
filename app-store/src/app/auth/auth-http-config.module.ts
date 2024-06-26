@@ -1,4 +1,10 @@
-import { AuthModule, StsConfigHttpLoader, StsConfigLoader } from 'angular-auth-oidc-client';
+import {
+  AbstractSecurityStorage,
+  AuthModule,
+  DefaultLocalStorageService,
+  StsConfigHttpLoader,
+  StsConfigLoader
+} from 'angular-auth-oidc-client';
 import { HttpClient } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { map } from 'rxjs/operators';
@@ -11,7 +17,7 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
     map(v => AuthUtils.toCamel(v)),
 
     map((customConfig: any) => {
-      const generateUrl = AuthUtils.toBoolWithDefault(customConfig.generateUrl, false);
+      const generateUrl = AuthUtils.toBoolWithDefault(customConfig.generateBaseUrl, false);
       let baseUrl: any;
 
       if (customConfig.baseUrl) {
@@ -20,20 +26,18 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
         baseUrl = AuthUtils.generateBaseUrl();
       }
 
-      let redirectPath = window.location.hash;
-      if (redirectPath.endsWith('sign-out') || redirectPath.endsWith('forbidden')) {
-        redirectPath = '#/home';
-      }
-
       return {
         authority: customConfig.authority,
-        redirectUrl: AuthUtils.withDefault(customConfig.redirectUrl, AuthUtils.suffixUrl(baseUrl, redirectPath)),
+        redirectUrl: AuthUtils.withDefault(
+          customConfig.redirectUrl,
+          AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.redirectPath, '#/sso'))
+        ),
         clientId: customConfig.clientId,
         responseType: customConfig.responseType,
         scope: customConfig.scope,
         postLogoutRedirectUri: AuthUtils.withDefault(
           customConfig.postLogoutRedirectUri,
-          AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.postLogoutPath, '/sign-out'))
+          AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.postLogoutPath, '#/sign-out'))
         ),
         startCheckSession: AuthUtils.toBoolWithDefault(customConfig.startCheckSession, false),
         silentRenew: AuthUtils.toBoolWithDefault(customConfig.silentRenew, false),
@@ -76,7 +80,7 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
       }
     })
   ],
-  //  providers: [{ provide: AbstractSecurityStorage, useClass: DefaultLocalStorageService }],
+  providers: [{ provide: AbstractSecurityStorage, useClass: DefaultLocalStorageService }],
   exports: [AuthModule]
 })
 export class AuthHttpConfigModule {}

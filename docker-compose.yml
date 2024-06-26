@@ -29,17 +29,15 @@ services:
     - traefik.http.routers.app-store-websecure.rule=PathPrefix(`/`)
     - traefik.http.routers.app-store-websecure.entrypoints=websecure
     - traefik.http.routers.app-store-websecure.tls=true
-    environment: 
+    environment:
+      app_conf_generate_base_url: "true"
       app_conf_authority: "https://${SERVER_IP}/auth/realms/universal"
-      app_conf_redirect_url: "https://${SERVER_IP}/app-store/#/sso"
       app_conf_client_id: "kp_prod_appstore"
       app_conf_response_type: "code"
       app_conf_scope: "openid profile email"
-      app_conf_post_logout_path: "/sign-out"
       app_conf_start_check_session: "true"
       app_conf_silent_renew: "true"
-      app_conf_silent_renew_path: "/assets/silent-renew.html"
-      app_conf_startup_route: "/home"
+      app_conf_silent_renew_path: "/silent-renew.html"
       app_conf_disable_iat_offset_validation: "false"
   emp-app:
     image: kprasad99/employee-app:v1.0.0
@@ -59,7 +57,6 @@ services:
     - traefik.http.routers.emp-app-websecure.tls=true
     environment: 
       app_conf_authority: "https://${SERVER_IP}/auth/realms/universal"
-      app_conf_redirect_url: "https://${SERVER_IP}/emp-app/#/sso"
       app_conf_client_id: "kp_prod_app1"
       app_conf_response_type: "code"
       app_conf_scope: "openid profile email"
