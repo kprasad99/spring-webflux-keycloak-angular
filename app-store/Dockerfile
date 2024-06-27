@@ -28,7 +28,7 @@ COPY src /workspace/src
 RUN pnpm run build-prod
 
 
-FROM alpine:3.20
+FROM gcr.io/distroless/static:nonroot
 
 ENV WEB_PORT=8080
 ENV WEB_CONTEXT_PATH=/app-store/

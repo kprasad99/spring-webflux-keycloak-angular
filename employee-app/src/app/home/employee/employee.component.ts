@@ -39,9 +39,7 @@ export class EmployeeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.auth.userData$.subscribe(e => {
-      this.userData = e;
-    });
+    this.auth.checkAuth().subscribe(({ userData }) => (this.userData = userData));
     this.empService.list().subscribe(e => (this.dataSource.data = e));
   }
 
@@ -54,7 +52,11 @@ export class EmployeeComponent implements OnInit {
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle(): void {
-    this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach(row => this.selection.select(row));
+    if (this.isAllSelected()) {
+      this.selection.clear();
+    } else {
+      this.dataSource.data.forEach(row => this.selection.select(row));
+    }
   }
 
   /** The label for the checkbox on the passed row */
@@ -77,7 +79,7 @@ export class EmployeeComponent implements OnInit {
 
   remove(): void {
     this.selection.selected.forEach(e =>
-      this.empService.remove(e).subscribe(r => {
+      this.empService.remove(e).subscribe(() => {
         this.dataSource.data = this.removeItem(this.dataSource.data, 'id', e.id);
       })
     );

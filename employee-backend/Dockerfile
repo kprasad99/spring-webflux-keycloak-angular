@@ -3,7 +3,7 @@
 
 FROM alpine:3.20 AS jvmBuilder
 
-RUN apk --no-cache add openjdk21-jdk openjdk21-jmods
+RUN apk --no-cache add openjdk21-jdk openjdk21-jmods binutils
 
 ENV JAVA_MINIMAL="/opt/java-minimal"
 
@@ -22,20 +22,21 @@ jdk.crypto.ec,jdk.unsupported \
 
 FROM gradle:8.8-jdk21 AS builder
 
-WORKDIR /app
+WORKDIR /workspace
 
-COPY gradle /app/gradle
-COPY gradlew /app/
-COPY build.gradle /app/
-COPY settings.gradle /app/
+COPY gradle /workspace/gradle
+COPY gradlew /workspace/
+COPY build.gradle /workspace/
+COPY settings.gradle /workspace/
+COPY gradle.properties /workspace/gradle.properties
 
 RUN gradle dependencies
 
-COPY src /app/src
+COPY src /workspace/src
 
 RUN gradle build \
     && java -Djarmode=layertools \
-    -jar build/libs/*.jar extract \
+    -jar build/libs/employee-backend.jar extract \
     --destination /app
 
 FROM alpine:3.20

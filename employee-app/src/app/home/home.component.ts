@@ -2,13 +2,12 @@ import { EventTypes, OidcSecurityService, PublicEventsService } from 'angular-au
 
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'kp-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
   user!: string;
@@ -21,26 +20,19 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.oidcSecurityService.userData$
-      .pipe(filter(Boolean))
-      .subscribe((v: any) => (this.user = v.userData.preferred_username));
-    this.oidcSecurityService.isAuthenticated$.subscribe(e => (this.isAuthenticated = e.isAuthenticated));
-    // setTimeout(() => {
-    //   this.eventService
-    //     .registerForEvents()
-    //     .pipe(filter(notification => notification.type === EventTypes.CheckSessionReceived))
-    //     .subscribe(value => {
-    //       console.log('Session changed event receieved ', value);
-    //       if (value && value.value === 'changed') {
-    //         console.log('Session changed logging out');
-    //         this.oidcSecurityService.logoff();
-    //         this.router.navigateByUrl('/sign-out');
-    //       }
-    //     });
-    // }, 5 * 1000);
+    this.oidcSecurityService.checkAuthIncludingServer().subscribe(({ userData }) => (this.user = userData.name));
+    this.eventService
+      .registerForEvents()
+      .pipe(filter(notification => notification.type === EventTypes.CheckSessionReceived))
+      .subscribe(value => {
+        console.log('Session changed event receieved ', value);
+        if (value && value.value === 'changed') {
+          this.oidcSecurityService.logoff().subscribe(() => this.router.navigateByUrl('/sign-out'));
+        }
+      });
   }
 
   logout(): void {
-    this.oidcSecurityService.logoff();
+    this.oidcSecurityService.logoff().subscribe();
   }
 }

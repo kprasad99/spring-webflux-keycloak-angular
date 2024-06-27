@@ -1,16 +1,11 @@
-import {
-  AbstractSecurityStorage,
-  AuthModule,
-  DefaultLocalStorageService,
-  StsConfigHttpLoader,
-  StsConfigLoader
-} from 'angular-auth-oidc-client';
-import { HttpClient } from '@angular/common/http';
+import { AuthModule, StsConfigHttpLoader, StsConfigLoader } from 'angular-auth-oidc-client';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { map } from 'rxjs/operators';
 
 import { AuthUtils } from './auth-utils';
 import { environment } from '../../environments/environment';
+import { errorInterceptor } from './error.interceptor';
 
 export const httpLoaderFactory = (httpClient: HttpClient) => {
   const config$ = httpClient.get<any>(environment.oidc_url).pipe(
@@ -80,7 +75,10 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
       }
     })
   ],
-  providers: [{ provide: AbstractSecurityStorage, useClass: DefaultLocalStorageService }],
+  providers: [
+    //  { provide: AbstractSecurityStorage, useClass: DefaultLocalStorageService },
+    provideHttpClient(withInterceptors([errorInterceptor]))
+  ],
   exports: [AuthModule]
 })
 export class AuthHttpConfigModule {}

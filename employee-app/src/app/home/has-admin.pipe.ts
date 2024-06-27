@@ -4,7 +4,8 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'hasAdmin'
 })
 export class HasAdminPipe implements PipeTransform {
-  transform(value: string[], ...args: unknown[]): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  transform(value: string[], ..._args: unknown[]): boolean {
     if (!value) {
       return false;
     }

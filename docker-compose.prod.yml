@@ -3,4 +3,7 @@ services:
     image: kprasad99/employee-backend:1.0.0
     build:
       context: ./employee-backend
-      dockerfile: Dockerfile.native
+      # Native build doesn't work due to conditional annotation on ContainerJwtDecoderConfiguration.java and SecurityConfiguration.java,
+      # comment @Conditional and then enable Dockerfile.native
+      # dockerfile: Dockerfile.native
+      dockerfile: Dockerfile

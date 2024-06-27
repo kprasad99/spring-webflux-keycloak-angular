@@ -56,15 +56,14 @@ services:
     - traefik.http.routers.emp-app-websecure.entrypoints=websecure
     - traefik.http.routers.emp-app-websecure.tls=true
     environment: 
+      app_conf_generate_base_url: "true"
       app_conf_authority: "https://${SERVER_IP}/auth/realms/universal"
       app_conf_client_id: "kp_prod_app1"
       app_conf_response_type: "code"
       app_conf_scope: "openid profile email"
-      app_conf_post_logout_path: "/sign-out"
       app_conf_start_check_session: "true"
       app_conf_silent_renew: "true"
-      app_conf_silent_renew_path: "/assets/silent-renew.html"
-      app_conf_startup_route: "/home"
+      app_conf_silent_renew_path: "/silent-renew.html"
       app_conf_disable_iat_offset_validation: "false"
   employee-backend:
     image: kprasad99/employee-backend:1.0.0-alpha
@@ -79,8 +78,10 @@ services:
     - "traefik.http.routers.employee-backend-web.entrypoints=web"
     - "traefik.http.routers.employee-backend-websecure.rule=PathPrefix(`/api`)"
     - "traefik.http.routers.employee-backend-websecure.entrypoints=websecure"
-    environment: 
-      spring.security.oauth2.resourceserver.jwt.issuer-uri: http://${SERVER_IP}/auth/realms/universal
+    - traefik.http.routers.employee-backend-websecure.tls=true
+    environment:
+      spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/auth/realms/universal
+      ingress.urls: "https://${SERVER_IP}/auth/realms/universal"
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.1
     networks:

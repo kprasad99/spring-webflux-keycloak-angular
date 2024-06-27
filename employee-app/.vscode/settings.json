@@ -11,7 +11,7 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "always"
     },
-    "editor.formatOnSave": false
+    "editor.formatOnSave": true
   },
   "[scss]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

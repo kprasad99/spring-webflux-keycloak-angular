@@ -2,8 +2,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { NgModule } from '@angular/core';
 
-import { AutoLoginAllRoutesGuard, AutoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
-
 import { EmployeeComponent } from './employee/employee.component';
 import { HomeComponent } from './home.component';
 
@@ -11,7 +9,6 @@ const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    canActivate: [AutoLoginAllRoutesGuard],
     children: [
       {
         path: '',
