@@ -1,15 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'kp-sign-out',
   templateUrl: './sign-out.component.html',
-  styleUrls: ['./sign-out.component.scss']
+  styleUrl: './sign-out.component.scss'
 })
-export class SignOutComponent implements OnInit {
-  constructor() {}
-
-  ngOnInit(): void {
-    localStorage.clear();
-    sessionStorage.clear();
-  }
-}
+export class SignOutComponent {}

@@ -18,17 +18,13 @@ export class AuthUtils {
 
   static suffixUrl(value: string, suffix: string): string {
     if (value && suffix) {
-      if (value.endsWith('/')) {
-        return value + suffix;
-      } else {
-        return value + '/' + suffix;
-      }
+      return value.endsWith('/') ? value + suffix : value + '/' + suffix;
     }
     return value;
   }
 
   static withDefault(value: string, defaultValue: string): string {
-    return value ? value : defaultValue;
+    return value || defaultValue;
   }
 
   static toCamel(obj: any): any {
@@ -47,10 +43,10 @@ export class AuthUtils {
   }
 
   static generateBaseUrl() {
-    let url = window.location.href;
+    const url = window.location.href;
     let queryParam = window.location.search;
     queryParam = queryParam.replace('/\\?$/', '');
-    const withoutHash = window.location.href.replace(window.location.hash, '');
+    const withoutHash = url.replace(window.location.hash, '');
     return withoutHash.replace(queryParam, '');
   }
 }

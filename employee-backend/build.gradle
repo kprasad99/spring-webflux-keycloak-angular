@@ -1,52 +1,58 @@
 plugins {
-	id 'org.springframework.boot' version "${springBootVersion}"
-	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
 	id 'java'
+	id 'org.springframework.boot' version "${springBootVersion}"
+	id 'io.spring.dependency-management' version '1.1.5'
+	id 'org.hibernate.orm' version '6.5.2.Final'
+	id 'org.graalvm.buildtools.native' version '0.10.2'
 }
 
 group = 'io.github.kprasad99'
-version = '0.1.0-SNAPSHOT'
-sourceCompatibility = '17'
+version = '1.0.0-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
 
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-	testCompileOnly {
-		extendsFrom annotationProcessor
-	}
 }
 
 repositories {
-	mavenLocal()
 	mavenCentral()
 }
 
-
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-	compileOnly 'org.projectlombok:lombok'
-	testCompileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'org.postgresql:postgresql'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+	  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+  implementation 'org.springframework.boot:spring-boot-starter-webflux'
+  implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+  implementation 'org.flywaydb:flyway-core'
+  implementation 'org.flywaydb:flyway-database-postgresql'
+  compileOnly 'org.projectlombok:lombok'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  runtimeOnly 'com.h2database:h2'
+  runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+  runtimeOnly 'org.postgresql:postgresql'
+  annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  annotationProcessor 'org.projectlombok:lombok'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'io.projectreactor:reactor-test'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+hibernate {
+  enhancement {
+    enableAssociationManagement = true
+  }
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
 }
 
 bootRun {
@@ -54,11 +60,26 @@ bootRun {
 }
 
 bootJar {
+    archiveFileName = "${project.name}.jar"
     layered {
 		enabled = true
 	}
 }
 
-test {
-	useJUnitPlatform()
+graalvmNative {
+	binaries {
+        main {
+            javaLauncher = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(21)
+                vendor = JvmVendorSpec.matching("Oracle Corporation")
+            }
+            // GraalVM Enterprise only https://www.graalvm.org/22.0/reference-manual/native-image/Options/
+            // buildArgs.add('--pgo')
+            // buildArgs.add('--gc=G1')
+		// 	buildArgs.add('--trace-class-initialization=ch.qos.logback.classic.Logger')
+      	// 	buildArgs.add('--trace-object-instantiation=ch.qos.logback.core.AsyncAppenderBase$Worker')
+      	// 	buildArgs.add('--initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback')
+		// //	buildArgs.add('--initialize-at-run-time=io.micrometer.common.util.internal.logging.LocationAwareSlf4JLogger')
+        }
+    }
 }

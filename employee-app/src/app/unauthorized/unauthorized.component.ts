@@ -1,10 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'kp-unauthorized',
   templateUrl: './unauthorized.component.html',
-  styleUrls: ['./unauthorized.component.scss']
+  styleUrl: './unauthorized.component.scss'
 })
-export class UnauthorizedComponent {
-  constructor() {}
-}
+export class UnauthorizedComponent {}

@@ -1,28 +1,41 @@
-
-FROM        golang:1.17-alpine3.15 as builder
+FROM        golang:1.22-alpine3.20 AS builder
 WORKDIR     /usr/src/go-web
-COPY        main.go /usr/src/go-web/main.go
 COPY        go.mod /usr/src/go-web/go.mod
-RUN         CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -v 
+COPY        go.sum /usr/src/go-web/go.sum
+RUN         go mod download
+COPY        main.go /usr/src/go-web/main.go
+RUN         CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a
 
-FROM        node:16-alpine3.15 as nmpBuilder
-WORKDIR     /opt/workspace
-COPY        package.json .
-COPY        package-lock.json .
 
-RUN         npm install
-COPY         . .
-RUN         npm run lint && npm run build-prod
+FROM node:20-alpine3.20 AS npmBuilder
 
-FROM        alpine:3.15
+WORKDIR /workspace
 
-COPY        --from=builder /usr/src/go-web/go-web /usr/local/bin/go-web
-COPY        --from=nmpBuilder /opt/workspace/dist/app/ /static/
+RUN npm install -g pnpm
+
+COPY package.json /workspace/package.json
+RUN pnpm install
+
+#COPY . /workspace
+COPY eslint.config.js /workspace/eslint.config.js
+COPY ngsw-config.json /workspace/ngsw-config.json
+COPY tsconfig.app.json /workspace/tsconfig.app.json
+COPY tsconfig.json /workspace/tsconfig.json
+COPY tsconfig.spec.json /workspace/tsconfig.spec.json
+COPY angular.json /workspace/angular.json
+COPY src /workspace/src
+
+RUN pnpm run build-prod
+
+FROM gcr.io/distroless/static:nonroot
 
 ENV WEB_PORT=8080
 ENV WEB_CONTEXT_PATH=/emp-app/
-
+USER 65532:65532
 VOLUME /static
 EXPOSE ${WEB_PORT}
+
+COPY --chown=65532:65532 --from=builder /usr/src/go-web/go-web /usr/local/bin/go-web
+COPY --chown=65532:65532 --from=npmBuilder /workspace/dist/app/browser /static/
 
 ENTRYPOINT  ["/usr/local/bin/go-web"]

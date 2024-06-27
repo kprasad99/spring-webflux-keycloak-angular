@@ -1,0 +1,11 @@
+<div fxLayout="column" fxLayoutAlign="center center" style="height: 100%; width: 100%" fxLayoutGap="8px">
+  <ng-container *ngIf="errMessage; else loginTemplate">
+    <h2>
+      <b>Failed to Login: </b><span style="color: red">{{ errMessage }}</span>
+    </h2>
+  </ng-container>
+  <ng-template #loginTemplate>
+    <mat-spinner mode="indeterminate"></mat-spinner>
+    <h2>Logging In...</h2>
+  </ng-template>
+</div>

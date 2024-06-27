@@ -10,9 +10,7 @@ describe('SignOutComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [SignOutComponent]
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(SignOutComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

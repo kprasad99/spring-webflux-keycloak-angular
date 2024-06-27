@@ -1,14 +1,14 @@
-# FROM openjdk:17-jre-slim
-# FROM amazoncorretto:17
+# FROM openjdk:21-jre-slim
+# FROM amazoncorretto:21
 
-FROM alpine:3.16 as jvmBuilder
+FROM alpine:3.20 AS jvmBuilder
 
-RUN apk --no-cache add openjdk17-jdk openjdk17-jmods
+RUN apk --no-cache add openjdk21-jdk openjdk21-jmods binutils
 
 ENV JAVA_MINIMAL="/opt/java-minimal"
 
 # build minimal JRE
-RUN /usr/lib/jvm/java-17-openjdk/bin/jlink \
+RUN /usr/lib/jvm/java-21-openjdk/bin/jlink \
     --verbose \
      --add-modules \
         java.base,java.desktop,java.instrument,\
@@ -17,30 +17,31 @@ java.security.jgss,java.security.sasl,java.sql,jdk.management.agent,jdk.manageme
 jdk.crypto.ec,jdk.unsupported \
     --compress 2 --strip-debug --no-header-files --no-man-pages \
 #    --bind-services \
-    --release-info="add:IMPLEMENTOR=Karthik:IMPLEMENTOR_VERSION=jre-17" \
+    --release-info="add:IMPLEMENTOR=Karthik:IMPLEMENTOR_VERSION=jre-21" \
     --output "$JAVA_MINIMAL"
 
-FROM gradle:7.4-jdk17 as builder
+FROM gradle:8.8-jdk21 AS builder
 
-WORKDIR /app
+WORKDIR /workspace
 
-COPY gradle /app/gradle
-COPY gradlew /app/
-COPY build.gradle /app/
-COPY settings.gradle /app/
+COPY gradle /workspace/gradle
+COPY gradlew /workspace/
+COPY build.gradle /workspace/
+COPY settings.gradle /workspace/
+COPY gradle.properties /workspace/gradle.properties
 
 RUN gradle dependencies
 
-COPY src /app/src
+COPY src /workspace/src
 
 RUN gradle build \
     && java -Djarmode=layertools \
-    -jar build/libs/*.jar extract \
+    -jar build/libs/employee-backend.jar extract \
     --destination /app
 
-FROM alpine:3.16
+FROM alpine:3.20
 
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 ENV PATH="$PATH:$JAVA_HOME/bin"
 ENV JAVA_OPTS=""
 ENV SERVER_PORT=8080
@@ -59,4 +60,4 @@ COPY --from=builder ${DEPENDENCY}/application/ ./
 
 EXPOSE ${SERVER_PORT}
 
-ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

@@ -1,17 +1,19 @@
 import { AuthModule, StsConfigHttpLoader, StsConfigLoader } from 'angular-auth-oidc-client';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { map } from 'rxjs/operators';
 
 import { AuthUtils } from './auth-utils';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
+import { errorInterceptor } from './error.interceptor';
+import { tokenInterceptor } from './token.interceptor';
 
 export const httpLoaderFactory = (httpClient: HttpClient) => {
   const config$ = httpClient.get<any>(environment.oidc_url).pipe(
     map(v => AuthUtils.toCamel(v)),
 
     map((customConfig: any) => {
-      const generateUrl = AuthUtils.toBoolWithDefault(customConfig.generateUrl, false);
+      const generateUrl = AuthUtils.toBoolWithDefault(customConfig.generateBaseUrl, false);
       let baseUrl: any;
 
       if (customConfig.baseUrl) {
@@ -20,14 +22,12 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
         baseUrl = AuthUtils.generateBaseUrl();
       }
 
-      let redirectPath = window.location.hash;
-      if (redirectPath.endsWith('sign-out') || redirectPath.endsWith('forbidden')) {
-        redirectPath = '#/home';
-      }
-
       return {
         authority: customConfig.authority,
-        redirectUrl: AuthUtils.withDefault(customConfig.redirectUrl, AuthUtils.suffixUrl(baseUrl, redirectPath)),
+        redirectUrl: AuthUtils.withDefault(
+          customConfig.redirectUrl,
+          AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.redirectPath, '#/sso'))
+        ),
         clientId: customConfig.clientId,
         responseType: customConfig.responseType,
         scope: customConfig.scope,
@@ -41,10 +41,15 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
           customConfig.silentRenewUrl,
           AuthUtils.suffixUrl(baseUrl, AuthUtils.withDefault(customConfig.slientRenewPath, 'silent-renew.html'))
         ),
-        postLoginRoute: AuthUtils.withDefault(customConfig.startupRoute, '/home/user'),
+        postLoginRoute: AuthUtils.withDefault(customConfig.startupRoute, '/home'),
         forbiddenRoute: AuthUtils.withDefault(customConfig.forbiddenRoute, '/forbidden'),
         unauthorizedRoute: AuthUtils.withDefault(customConfig.unauthorizedRoute, '/unauthorized'),
         useRefreshToken: AuthUtils.toBoolWithDefault(customConfig.useRefreshToken, false),
+        ignoreNonceAfterRefresh: AuthUtils.toBoolWithDefault(customConfig.ignoreNonceAfterRefresh, true), // this is required if the id_token is not returned
+        triggerRefreshWhenIdTokenExpired: AuthUtils.toBoolWithDefault(
+          customConfig.triggerRefreshWhenIdTokenExpired,
+          false
+        ), // required when refreshing the browser if id_token is not updated after the first authentication
         triggerAuthorizationResultEvent: true,
         logLevel: AuthUtils.toIntWithDefault(customConfig.logLevel, 0), // LogLevel.Debug,
         maxIdTokenIatOffsetAllowedInSeconds: AuthUtils.toIntWithDefault(
@@ -70,6 +75,10 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
         deps: [HttpClient]
       }
     })
+  ],
+  providers: [
+    // { provide: AbstractSecurityStorage, useClass: DefaultLocalStorageService },
+    provideHttpClient(withInterceptors([tokenInterceptor, errorInterceptor]))
   ],
   exports: [AuthModule]
 })

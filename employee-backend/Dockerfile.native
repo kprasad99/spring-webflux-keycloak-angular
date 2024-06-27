@@ -1,0 +1,25 @@
+FROM container-registry.oracle.com/graalvm/native-image:21 AS builder
+
+WORKDIR /app
+COPY gradlew /app/
+COPY gradle /app/gradle
+COPY settings.gradle /app/
+COPY gradle.properties /app/
+COPY build.gradle /app/
+RUN  ls -l && ./gradlew clean
+COPY src /app/src
+
+RUN ./gradlew clean nativeCompile
+
+FROM alpine:3.20
+
+WORKDIR /app
+
+RUN apk add --no-cache gcompat
+
+COPY --from=builder /app/build/native/nativeCompile/employee-backend /app/employee-backend
+
+EXPOSE 8080
+VOLUME [ "/tmp" ]
+
+ENTRYPOINT ["/app/employee-backend"]

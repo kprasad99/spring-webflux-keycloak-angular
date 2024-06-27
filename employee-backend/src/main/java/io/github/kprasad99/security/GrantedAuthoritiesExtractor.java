@@ -17,7 +17,7 @@ public class GrantedAuthoritiesExtractor implements Converter<Jwt, Collection<Gr
 		Collection<String> authorities = (Collection<String>) jwt.getClaims().getOrDefault("authorities",
 				Collections.emptyList());
 		Collection<String> scopes = Arrays.stream(((String) jwt.getClaims().getOrDefault("scope", "")).split(" "))
-				.map(String::trim).collect(Collectors.toList());
+				.map(String::trim).toList();
 		authorities.addAll(scopes);
 		return authorities.stream().map(Object::toString).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
 	}
