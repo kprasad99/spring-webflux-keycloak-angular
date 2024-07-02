@@ -2,7 +2,7 @@ module github.com/kprasad99/go-web
 
 go 1.22
 
-require github.com/gofiber/fiber/v2 v2.52.4
+require github.com/gofiber/fiber/v2 v2.52.5
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
