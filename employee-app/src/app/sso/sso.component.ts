@@ -9,8 +9,6 @@ import { Router } from '@angular/router';
   styleUrl: './sso.component.scss'
 })
 export class SsoComponent implements OnInit {
-  errMessage = '';
-
   constructor(
     public router: Router,
     public oidcSecurityService: OidcSecurityService,
@@ -24,31 +22,42 @@ export class SsoComponent implements OnInit {
           sessionStorage.removeItem('oidc_retries');
           this.router.navigateByUrl(this.storageService.read('redirect') ?? '/home');
         } else {
-          const retriesStr = sessionStorage.getItem('oidc_retires');
+          const retriesStr = sessionStorage.getItem('oidc_retries');
           let retries = retriesStr ? +retriesStr : 0;
-          if (retries > 2 && errorMessage) {
-            this.errMessage = errorMessage;
+          if (retries > 2) {
+            sessionStorage.removeItem('oidc_retries');
+            this.router.navigate(['/unauthorized'], {
+              queryParams: {
+                message: errorMessage ?? 'unable to login, unknown error'
+              }
+            });
           } else {
-            retries += 1;
-            sessionStorage.setItem('oidc_retires', '' + retries);
+            sessionStorage.setItem('oidc_retries', '' + ++retries);
             this.oidcSecurityService.authorize();
           }
         }
       },
       error: e => {
+        let msg = '';
         if (e?.errorMessage) {
-          this.errMessage = e.errorMessage;
+          msg = e.errorMessage;
         } else if (e?.error instanceof Error) {
-          this.errMessage = e.error.message;
+          msg = e.error.message;
         } else if (e instanceof Error) {
           if (e.message.startsWith('Error: [object Object]')) {
-            this.errMessage = 'OIDC server not available';
+            msg = 'OIDC server not available';
           } else {
-            this.errMessage = e.message;
+            msg = e.message;
           }
         } else {
-          this.errMessage = e;
+          msg = e;
         }
+        sessionStorage.removeItem('oidc_retries');
+        this.router.navigate(['/unauthorized'], {
+          queryParams: {
+            message: msg
+          }
+        });
       }
     });
   }
