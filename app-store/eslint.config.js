@@ -1,22 +1,24 @@
 // @ts-check
 const eslint = require("@eslint/js");
+const { defineConfig } = require("eslint/config");
 const tseslint = require("typescript-eslint");
 const angular = require("angular-eslint");
-const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
+const prettier = require("eslint-plugin-prettier");
+const prettierConfig = require("eslint-config-prettier");
 
-module.exports = tseslint.config(
+
+module.exports = defineConfig([
   {
     files: ["**/*.ts"],
     extends: [
       eslint.configs.recommended,
-      ...tseslint.configs.recommended,
-      ...tseslint.configs.stylistic,
-      ...angular.configs.tsRecommended,
-      eslintPluginPrettierRecommended,
+      tseslint.configs.recommended,
+      tseslint.configs.stylistic,
+      angular.configs.tsRecommended,
+      prettierConfig,
     ],
     processor: angular.processInlineTemplates,
     rules: {
-      "@typescript-eslint/no-explicit-any": "off",
       "@angular-eslint/directive-selector": [
         "error",
         {
@@ -46,16 +48,22 @@ module.exports = tseslint.config(
               "single"
             ],
             "allowSeparatedGroups": true
-          }
-        ]
+          },
+        ],
+      "prettier/prettier": [
+        "error",
+        {
+          "parser": "angular"
+        }
+      ]
     },
   },
   {
     files: ["**/*.html"],
     extends: [
-      ...angular.configs.templateRecommended,
-      ...angular.configs.templateAccessibility,
-      eslintPluginPrettierRecommended,
+      angular.configs.templateRecommended,
+      angular.configs.templateAccessibility,
+      prettierConfig,
     ],
     rules: {
       "prettier/prettier": [
@@ -67,4 +75,4 @@ module.exports = tseslint.config(
         ]
     },
   }
-);
+]);

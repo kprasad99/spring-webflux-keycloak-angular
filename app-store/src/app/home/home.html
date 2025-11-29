@@ -1,0 +1,54 @@
+<div class="flex flex-col h-full gap-[5px]">
+  <mat-toolbar class="toolbar-primary">
+    <span>APP STORE</span>
+    <div class="flex-1"></div>
+    <div>
+      @if (user()) {
+        <span class="mr-2">{{ user() }}</span>
+        <button mat-icon-button [matMenuTriggerFor]="appMenu" class="!text-white">
+          <mat-icon>person</mat-icon>
+        </button>
+      } @else {
+        <button mat-icon-button [matMenuTriggerFor]="appMenu" class="!text-white">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      }
+      <mat-menu #appMenu="matMenu">
+        <button mat-menu-item>Settings</button>
+        <button mat-menu-item>Help</button>
+        <mat-divider></mat-divider>
+        <button (click)="logout()" mat-menu-item>Logout</button>
+      </mat-menu>
+    </div>
+  </mat-toolbar>
+  <div class="flex-1 overflow-auto">
+    <div class="flex flex-col h-full items-center justify-center">
+      @for (app of apps(); track app.url) {
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>{{ app.title }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="p-4"></div>
+          </mat-card-content>
+          <mat-card-actions class="flex justify-center">
+            <a
+              [href]="app.url"
+              target="_blank"
+              mat-flat-button
+              class="btn-accent"
+              aria-label="Open app"
+            >
+              <mat-icon class="!text-2xl !w-6 !h-6 !leading-6">arrow_right_alt</mat-icon>
+            </a>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  </div>
+  <mat-toolbar class="toolbar-primary">
+    <div class="flex flex-row items-center justify-center w-full">
+      All Rights Reserved 2003-2020 &#64; Karthik Prasad
+    </div>
+  </mat-toolbar>
+</div>
