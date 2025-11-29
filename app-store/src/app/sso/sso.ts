@@ -1,11 +1,13 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { AbstractSecurityStorage, EventTypes, OidcSecurityService } from 'angular-auth-oidc-client';
+import { Component, OnInit, inject, signal } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
-import { AbstractSecurityStorage, OidcSecurityService, EventTypes } from 'angular-auth-oidc-client';
-import { AuthErrorService } from '../auth/auth-error.service';
+
 import { delay } from 'rxjs';
+
+import { AuthErrorService } from '../auth/auth-error.service';
 
 @Component({
   selector: 'kp-sso',

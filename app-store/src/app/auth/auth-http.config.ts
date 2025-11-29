@@ -1,14 +1,18 @@
-import { HttpClient } from '@angular/common/http';
 import {
   PassedInitialConfig,
   StsConfigHttpLoader,
   StsConfigLoader,
 } from 'angular-auth-oidc-client';
+
+import { HttpClient } from '@angular/common/http';
+
 import { map } from 'rxjs/operators';
+
 import { AuthUtils } from './auth-utils';
 import { environment } from '../../environments/environment';
 
 export const httpLoaderFactory = (httpClient: HttpClient) => {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const config$ = httpClient.get<any>(environment.oidc_url).pipe(
     map((v) => AuthUtils.toCamel(v)),
 
@@ -73,7 +77,7 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
       };
     }),
   );
-
+  /* eslint-enable @typescript-eslint/no-explicit-any */
   return new StsConfigHttpLoader(config$);
 };
 

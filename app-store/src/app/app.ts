@@ -1,7 +1,9 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { EventTypes, OidcSecurityService, PublicEventsService } from 'angular-auth-oidc-client';
+import { Router, RouterOutlet } from '@angular/router';
+
 import { Subscription } from 'rxjs';
+
 import { AuthErrorService } from './auth/auth-error.service';
 
 @Component({

@@ -8,9 +8,8 @@ describe('Sso', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Sso]
-    })
-    .compileComponents();
+      imports: [Sso],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(Sso);
     component = fixture.componentInstance;

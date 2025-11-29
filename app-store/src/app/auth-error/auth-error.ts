@@ -1,14 +1,16 @@
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   computed,
   inject,
-  OnInit,
   signal,
 } from '@angular/core';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 type ErrorReason = 'time-skew' | 'network' | 'generic';

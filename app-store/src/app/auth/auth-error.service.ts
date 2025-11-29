@@ -1,5 +1,7 @@
 import { Injectable, inject } from '@angular/core';
+
 import { Router } from '@angular/router';
+
 import { EventTypes } from 'angular-auth-oidc-client';
 
 export type AuthErrorType =

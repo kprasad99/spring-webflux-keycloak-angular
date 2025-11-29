@@ -3,13 +3,16 @@ const eslint = require("@eslint/js");
 const { defineConfig } = require("eslint/config");
 const tseslint = require("typescript-eslint");
 const angular = require("angular-eslint");
-const prettier = require("eslint-plugin-prettier");
+const prettierPlugin = require("eslint-plugin-prettier");
 const prettierConfig = require("eslint-config-prettier");
 
 
 module.exports = defineConfig([
   {
     files: ["**/*.ts"],
+    plugins: {
+      prettier: prettierPlugin,
+    },
     extends: [
       eslint.configs.recommended,
       tseslint.configs.recommended,
@@ -50,16 +53,14 @@ module.exports = defineConfig([
             "allowSeparatedGroups": true
           },
         ],
-      "prettier/prettier": [
-        "error",
-        {
-          "parser": "angular"
-        }
-      ]
+      "prettier/prettier": "error"
     },
   },
   {
     files: ["**/*.html"],
+    plugins: {
+      prettier: prettierPlugin,
+    },
     extends: [
       angular.configs.templateRecommended,
       angular.configs.templateAccessibility,
@@ -69,7 +70,6 @@ module.exports = defineConfig([
       "prettier/prettier": [
           "error",
           {
-            "singleQuote": true,
             "parser": "angular"
           }
         ]

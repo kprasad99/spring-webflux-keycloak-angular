@@ -4,10 +4,12 @@ import {
   HttpInterceptorFn,
   HttpRequest,
 } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { catchError, throwError } from 'rxjs';
+
+import { Router } from '@angular/router';
+import { inject } from '@angular/core';
+
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 /**
  * Check if the request is to an OIDC/OAuth endpoint that should be skipped.
