@@ -27,26 +27,27 @@ export class AuthUtils {
     return value || defaultValue;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static toCamel(obj: any): any {
     if (Array.isArray(obj)) {
-      return obj.map(v => AuthUtils.toCamel(v));
+      return obj.map((v) => AuthUtils.toCamel(v));
     } else if (obj !== null && obj.constructor === Object) {
       return Object.keys(obj).reduce(
         (result, key) => ({
           ...result,
-          [camelCase(key)]: AuthUtils.toCamel(obj[key])
+          [camelCase(key)]: AuthUtils.toCamel(obj[key]),
         }),
-        {}
+        {},
       );
     }
     return obj;
   }
 
   static generateBaseUrl() {
-    const url = window.location.href;
-    let queryParam = window.location.search;
+    const url = globalThis.location.href;
+    let queryParam = globalThis.location.search;
     queryParam = queryParam.replace('/\\?$/', '');
-    const withoutHash = url.replace(window.location.hash, '');
+    const withoutHash = url.replace(globalThis.location.hash, '');
     return withoutHash.replace(queryParam, '');
   }
 }

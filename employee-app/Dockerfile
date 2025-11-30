@@ -1,10 +1,10 @@
-FROM        golang:1.22-alpine3.20 AS builder
+FROM        golang:1.25-alpine AS builder
 WORKDIR     /usr/src/go-web
 COPY        go.mod /usr/src/go-web/go.mod
 COPY        go.sum /usr/src/go-web/go.sum
 RUN         go mod download
 COPY        main.go /usr/src/go-web/main.go
-RUN         CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a
+RUN         CGO_ENABLED=0 GOEXPERIMENT=jsonv2,greenteagc GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a
 
 
 FROM node:20-alpine3.20 AS npmBuilder
@@ -27,10 +27,11 @@ COPY src /workspace/src
 
 RUN pnpm run build-prod
 
+
 FROM gcr.io/distroless/static:nonroot
 
 ENV WEB_PORT=8080
-ENV WEB_CONTEXT_PATH=/emp-app/
+ENV WEB_CONTEXT_PATH=/app-store/
 USER 65532:65532
 VOLUME /static
 EXPOSE ${WEB_PORT}

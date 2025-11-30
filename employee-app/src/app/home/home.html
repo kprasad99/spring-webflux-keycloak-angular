@@ -1,0 +1,32 @@
+<div class="flex flex-col h-full gap-[5px]">
+  <mat-toolbar class="toolbar-primary">
+    <span>Employee Portal</span>
+    <div class="flex-1"></div>
+    <div>
+      @if (user()) {
+        <span class="mr-2">{{ user() }}</span>
+        <button mat-icon-button [matMenuTriggerFor]="appMenu" class="!text-white">
+          <mat-icon>person</mat-icon>
+        </button>
+      } @else {
+        <button mat-icon-button [matMenuTriggerFor]="appMenu" class="!text-white">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      }
+      <mat-menu #appMenu="matMenu">
+        <button mat-menu-item>Settings</button>
+        <button mat-menu-item>Help</button>
+        <mat-divider></mat-divider>
+        <button (click)="logout()" mat-menu-item>Logout</button>
+      </mat-menu>
+    </div>
+  </mat-toolbar>
+  <div class="flex-1 overflow-auto">
+    <router-outlet></router-outlet>
+  </div>
+  <mat-toolbar class="toolbar-primary">
+    <div class="flex flex-row items-center justify-center w-full">
+      All Rights Reserved 2003-2020 &#64; Karthik Prasad
+    </div>
+  </mat-toolbar>
+</div>

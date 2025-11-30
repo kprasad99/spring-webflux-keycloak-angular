@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  oidc_url: './conf'
+  oidc_url: './conf',
 };

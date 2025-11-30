@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -47,7 +48,30 @@ func main() {
 
 	contextPath = strings.TrimSuffix(contextPath, "/")
 
-	app := fiber.New()
+	config := fiber.Config{
+		Prefork:           true,
+		ReduceMemoryUsage: true,
+		ETag:              true,
+	}
+
+	readBufferSize := os.Getenv("READ_BUFFER_SIZE")
+	if readBufferSize != "" {
+		val, err := strconv.Atoi(readBufferSize)
+		if err == nil {
+			config.ReadBufferSize = val
+		}
+	}
+
+	writeBufferSize := os.Getenv("WRITE_BUFFER_SIZE")
+	if writeBufferSize != "" {
+		val, err := strconv.Atoi(writeBufferSize)
+		if err == nil {
+			config.WriteBufferSize = val
+		}
+	}
+
+	app := fiber.New(config)
+
 	app.Get("/liveness", okHandler)
 	app.Get("/readiness", okHandler)
 	app.Get("/conf", getConf)

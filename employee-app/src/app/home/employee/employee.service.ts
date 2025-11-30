@@ -1,25 +1,26 @@
+import { Injectable, inject } from '@angular/core';
+
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
-import { Employee } from './employee.component';
+import { EmployeeData } from './employee';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EmployeeService {
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
-  add(emp: Employee): Observable<Employee> {
-    return this.http.put<Employee>('/api/employee', emp);
+  add(emp: EmployeeData): Observable<EmployeeData> {
+    return this.http.put<EmployeeData>('/api/employee', emp);
   }
 
-  remove(emp: Employee): Observable<void> {
+  remove(emp: EmployeeData): Observable<void> {
     return this.http.delete<void>(`/api/employee/${emp.id}`);
   }
 
-  list(): Observable<Employee[]> {
-    return this.http.get<Employee[]>('/api/employee');
+  list(): Observable<EmployeeData[]> {
+    return this.http.get<EmployeeData[]>('/api/employee');
   }
 }
