@@ -1,71 +1,430 @@
 
 :icon: font
+:toc: auto
+:toclevels: 3
 
 # Spring WebFlux with Keycloak and Angular SSO Example
 
 ## Features
-- Spring WebFlux as Resource Server.
-- Keycloak as OIDC provider.
-- Angular application with SSO.
-- App store example
-- Launch Employee Angular front end directly or using app store.
-- Two roles Admin and user roles supported.
-- Admin can perform CRUD operations.
-- User role can view only.
-- Role validation is done both at frontend and backend.
-- username and password - admin -> admin1/password - user -> user1/password
 
-## How to run using docker-compose [WIP]
+- Spring WebFlux as Resource Server (Spring Boot 4.0)
+- Keycloak as OIDC provider
+- Angular 21 application with SSO
+- App store example with PWA support
+- Launch Employee Angular front end directly or using app store
+- Two roles: Admin and User
+- Admin can perform CRUD operations
+- User role can view only
+- Role validation at both frontend and backend
+- Credentials: `admin1/password` (admin), `user1/password` (user)
 
-- Replace all occurance of IP Address in `keycloak/universal-realm.json` with your host IP Address.
-- Replace all occurance of IP Address in `docker-compose.yml` with your host IP Address.
-- Start the applications using docker-compose
-+
-----
-$ docker-compose up -d
-----
-- Now you can access the application at  url `http://<host-ip>
+## Tech Stack
 
-[NOTE]
-====
-To rebuild and run single container
-[source,shell]
-----
-$ docker-compose up -d --force-recreate --no-deps --build -V <service-name>
-----
-====
-## How to run apps using `ng serve` with just keycloak using docker.
+|===
+| Component | Technology | Version
 
-- Change application redirect uri ipaddress to host ip where the application will run in `keycloak/universal-realm.json`
-- Change employee-app ipaddress in app-store `app-store/src/app/assets/config/apps.json` to host IP where the application will be running.
-- Change keycloak ipaddress in app-store `app-store/src/app/assets/config/oidc.json` to host IP where the keycloak will be running.
-- Change keycloak ipaddress in employee-app `employee-app/src/app/assets/config/oidc.json` to host IP where the keycloak will be running.
-- Change employee-backend ipaddress in employee-app `employee-app/proxy-config.json` to host IP where the employee-backend will be running.
-- Change keycloak ipaddress in employee-backend `employee-backend/src/main/resources/application.yml` to host IP where the keycloak will be running.
-- start keycloak
-+
+| Frontend | Angular | 21.x
+| UI Framework | Angular Material | 21.x
+| CSS Framework | Tailwind CSS | 4.x
+| Backend | Spring Boot WebFlux | 4.0.x
+| Auth Server | Keycloak | 26.x
+| Reverse Proxy | Traefik | 3.6
+| Static Server | Go Fiber | 2.x
+| Database | PostgreSQL | 18.x
+|===
+
+## Project Setup Guide
+
+### Creating a New Angular Application
+
+[source,bash]
 ----
-docker-compose up -d keycloak
+ng new app-store \
+  --ai-config agents \
+  --ai-config copilot \
+  --package-manager pnpm \
+  --routing \
+  -p kp \
+  -g \
+  --style scss \
+  --test-runner vitest
 ----
 
-- Build and start app-store
-+
+.Command Options Explained
+|===
+| Option | Description
+
+| `--ai-config agents` | Enables AI agent configuration (AGENTS.md)
+| `--ai-config copilot` | Enables GitHub Copilot integration
+| `--package-manager pnpm` | Uses pnpm for faster, disk-efficient package management
+| `--routing` | Adds Angular Router module
+| `-p kp` | Sets component selector prefix to `kp`
+| `-g` | Skip git initialization (useful when adding to existing repo)
+| `--style scss` | Uses SCSS for styling
+| `--test-runner vitest` | Uses Vitest instead of Karma for unit testing
+|===
+
+### Adding Angular Material
+
+[source,bash]
 ----
-$ cd app-store
-$ npm install
-$ ng serve --host 0.0.0.0 --ssl
+ng add @angular/material
 ----
-- Build and start emplyee-app
-+
+
+This will prompt you to:
+
+- Choose a prebuilt theme or custom theme
+- Set up global Angular Material typography styles
+- Include Angular animations module
+
+### Adding Tailwind CSS v4
+
+Tailwind CSS v4 uses a new PostCSS-based architecture with automatic content detection.
+
+#### Step 1: Install Dependencies
+
+[source,bash]
 ----
-$ cd emplyee-app
-$ npm install
-$ ng serve --host 0.0.0.0 --port 4201 --ssl
+pnpm add -D tailwindcss @tailwindcss/postcss postcss autoprefixer
 ----
-- start employee backend
-+
+
+#### Step 2: Create PostCSS Configuration
+
+Create `.postcssrc.json` in the project root:
+
+[source,javascript]
 ----
-$ cd employee-backend
-$ mvn spring-boot:run
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {}
+  }
+}
 ----
-- now app-store can be accessed on url `https://localhost:4200`
+
+#### Step 3: Create Tailwind CSS Entry Point
+
+Create `src/styles.scss`:
+
+[source,css]
+----
+@use 'tailwindcss';
+----
+
+#### Step 5: Disable Critical CSS Inlining (Important for Production)
+
+In `angular.json`, under `configurations.production.optimization`:
+
+[source,json]
+----
+"optimization": {
+  "scripts": true,
+  "styles": {
+    "minify": true,
+    "inlineCritical": false
+  },
+  "fonts": true
+}
+----
+
+WARNING: If `inlineCritical` is `true`, Angular's Beasties library may strip Tailwind utility classes that aren't used in above-the-fold content.
+
+#### Tailwind v4 Key Differences from v3
+
+|===
+| Feature | Tailwind v3 | Tailwind v4
+
+| Configuration | `tailwind.config.js` required | Auto-detection (no config needed)
+| PostCSS Plugin | `tailwindcss` | `@tailwindcss/postcss`
+| CSS Import | `@tailwind base/components/utilities` | `@import 'tailwindcss'`
+| Content Detection | Manual `content` array | Automatic
+|===
+
+### Integrating Prettier with Angular ESLint
+
+Prettier ensures consistent code formatting across the team.
+
+#### Step 1: Install Dependencies
+
+[source,bash]
+----
+pnpm add -D prettier eslint-config-prettier eslint-plugin-prettier
+----
+
+.Package Purposes
+|===
+| Package | Purpose
+
+| `prettier` | Core Prettier formatter
+| `eslint-config-prettier` | Disables ESLint rules that conflict with Prettier
+| `eslint-plugin-prettier` | Runs Prettier as an ESLint rule
+|===
+
+#### Step 2: Create Prettier Configuration
+
+Create `.prettierrc` in the project root:
+
+[source,json]
+----
+{
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "semi": true,
+  "printWidth": 120,
+  "bracketSpacing": true,
+  "arrowParens": "avoid",
+  "endOfLine": "lf"
+}
+----
+
+#### Step 3: Create Prettier Ignore File
+
+Create `.prettierignore`:
+
+[source]
+----
+dist
+coverage
+node_modules
+pnpm-lock.yaml
+*.min.js
+*.min.css
+----
+
+#### Step 4: Update ESLint Configuration
+
+Update `eslint.config.js`:
+
+[source,javascript]
+----
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import angular from 'angular-eslint';
+import prettier from 'eslint-config-prettier';
+import prettierPlugin from 'eslint-plugin-prettier';
+
+export default tseslint.config(
+  {
+    files: ['**/*.ts'],
+    extends: [
+      eslint.configs.recommended,
+      ...tseslint.configs.recommended,
+      ...tseslint.configs.stylistic,
+      ...angular.configs.tsRecommended,
+      prettier,
+    ],
+    plugins: {
+      prettier: prettierPlugin,
+    },
+    processor: angular.processInlineTemplates,
+    rules: {
+      'prettier/prettier': 'error',
+      '@angular-eslint/directive-selector': [
+        'error',
+        { type: 'attribute', prefix: 'kp', style: 'camelCase' },
+      ],
+      '@angular-eslint/component-selector': [
+        'error',
+        { type: 'element', prefix: 'kp', style: 'kebab-case' },
+      ],
+    },
+  },
+  {
+    files: ['**/*.html'],
+    extends: [
+      ...angular.configs.templateRecommended,
+      ...angular.configs.templateAccessibility,
+    ],
+  }
+);
+----
+
+#### Step 5: Add NPM Scripts
+
+Add to `package.json`:
+
+[source,json]
+----
+{
+  "scripts": {
+    "format": "prettier --write \"src/**/*.{ts,html,scss,css,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,scss,css,json}\"",
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix"
+  }
+}
+----
+
+#### Step 6: Configure VS Code
+
+Create `.vscode/settings.json`:
+
+[source,json]
+----
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
+----
+
+Create `.vscode/extensions.json` for recommended extensions:
+
+[source,json]
+----
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "angular.ng-template",
+    "bradlc.vscode-tailwindcss"
+  ]
+}
+----
+
+#### Usage
+
+[source,bash]
+----
+# Check formatting without making changes
+pnpm format:check
+
+# Auto-fix formatting issues
+pnpm format
+
+# Lint and fix
+pnpm lint:fix
+----
+
+### Adding PWA Support
+
+[source,bash]
+----
+ng add @angular/pwa
+----
+
+This adds:
+
+- Service worker configuration (`ngsw-config.json`)
+- Web app manifest (`manifest.webmanifest`)
+- App icons in `public/icons/`
+- Service worker registration in `app.config.ts`
+
+### Adding OIDC Authentication
+
+[source,bash]
+----
+ng add angular-auth-oidc-client
+----
+
+Configure in `app.config.ts` or create a separate auth configuration module.
+
+## Running the Application
+
+### Prerequisites
+
+Add the following to `/etc/hosts`:
+
+[source]
+----
+<docker-host-ip>  keycloak-ng-sso-example.local
+----
+
+Replace `<docker-host-ip>` with your Docker host IP address (e.g., `192.168.1.100`).
+
+### Production Mode (Docker Compose)
+
+[source,bash]
+----
+# Start all services
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Rebuild a specific service
+docker compose up -d --force-recreate --no-deps --build -V <service-name>
+----
+
+Access the application at `https://<host-ip>`
+
+### Development Mode
+
+#### Running Angular Frontend
+
+[source,bash]
+----
+# Set environment variable
+export HOSTNAME=keycloak-ng-sso-example.local
+
+# Start app-store
+cd app-store
+pnpm install
+pnpm serve-dev
+
+# Or start employee-app (in another terminal)
+cd employee-app
+pnpm install
+pnpm serve-dev
+----
+
+#### Running Spring Boot Backend
+
+[source,bash]
+----
+cd employee-backend
+./gradlew bootRun \
+  -Dspring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:18080/auth/realms/universal
+----
+
+#### Running Only Keycloak (for Frontend Development)
+
+[source,bash]
+----
+docker compose up -d keycloak postgres
+----
+
+Keycloak will be available at `http://localhost:18080/auth`
+
+## Memory Configuration
+
+### Go Applications (app-store, emp-app)
+
+[source,yaml]
+----
+environment:
+  GOMEMLIMIT: 100MiB
+  GOGC: off
+----
+
+### Spring Boot Application (employee-backend)
+
+[source,yaml]
+----
+environment:
+  JAVA_OPTS: "-XX:InitialRAMPercentage=70 -XX:MaxRAMPercentage=70"
+----
+
+.JVM Memory Guidelines
+|===
+| Container Memory | MaxRAMPercentage | Use Case
+
+| 256MB | 50% | Minimal Spring Boot
+| 512MB | 70% | Standard Spring Boot
+| 1GB+ | 75% | Large applications
+|===
+
