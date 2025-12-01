@@ -25,6 +25,7 @@ COPY tsconfig.app.json /workspace/tsconfig.app.json
 COPY tsconfig.json /workspace/tsconfig.json
 COPY tsconfig.spec.json /workspace/tsconfig.spec.json
 COPY angular.json /workspace/angular.json
+COPY public /workspace/public
 COPY src /workspace/src
 
 RUN pnpm run build-prod

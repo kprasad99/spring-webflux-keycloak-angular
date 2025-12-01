@@ -2,9 +2,18 @@ import { Injectable, inject } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { map } from 'rxjs';
 
+const LOGOUT_CHANNEL_NAME = 'sso-logout';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly oidcService = inject(OidcSecurityService);
+  private readonly logoutChannel?: BroadcastChannel;
+
+  constructor() {
+    if (typeof BroadcastChannel !== 'undefined') {
+      this.logoutChannel = new BroadcastChannel(LOGOUT_CHANNEL_NAME);
+    }
+  }
 
   isAuthenticated$ = this.oidcService.isAuthenticated$.pipe(
     map(({ isAuthenticated }) => isAuthenticated),
@@ -23,6 +32,8 @@ export class AuthService {
   }
 
   logout() {
+    // Broadcast to other tabs before logging out
+    this.logoutChannel?.postMessage('logout');
     this.oidcService.logoff().subscribe();
   }
 

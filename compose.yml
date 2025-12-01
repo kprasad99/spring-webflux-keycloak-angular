@@ -19,7 +19,9 @@ services:
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
   app-store:
     image: kprasad99/app-store:v1.2.0
-    build: ./app-store
+    build:
+      context: ./app-store
+      dockerfile: Dockerfile
     networks:
     - k-network
     deploy:

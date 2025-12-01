@@ -53,7 +53,6 @@ export class Employee implements OnInit {
 
   ngOnInit(): void {
     this.auth.checkAuth().subscribe(({ userData }) => {
-      console.log('Employee component user data:', userData);
       this.userData.set(userData);
     });
     this.empService.list().subscribe((e) => (this.dataSource.data = e));

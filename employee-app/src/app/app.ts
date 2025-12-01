@@ -1,10 +1,13 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect, inject, signal } from '@angular/core';
 import { EventTypes, OidcSecurityService, PublicEventsService } from 'angular-auth-oidc-client';
 import { Router, RouterOutlet } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
 import { AuthErrorService } from './auth/auth-error.service';
+import { CheckSessionService } from './auth/check-session.service';
+
+const LOGOUT_CHANNEL_NAME = 'sso-logout';
 
 @Component({
   selector: 'kp-root',
@@ -15,20 +18,37 @@ export class App implements OnInit, OnDestroy {
   protected readonly title = signal('Employee Portal');
   private readonly oidcService = inject(OidcSecurityService);
   private readonly eventService = inject(PublicEventsService);
+  private readonly checkSessionService = inject(CheckSessionService);
   private readonly router = inject(Router);
   private readonly authErrorService = inject(AuthErrorService);
   private eventSubscription?: Subscription;
+  private logoutChannel?: BroadcastChannel;
+
+  constructor() {
+    // React to session changes from custom check session service
+    effect(() => {
+      if (this.checkSessionService.sessionChanged()) {
+        this.handleSsoLogout('session-ended');
+      }
+    });
+  }
 
   ngOnInit() {
     // Set up event listeners for SSO events
     this.setupAuthEventListeners();
+
+    // Set up BroadcastChannel for same-browser cross-tab logout (faster than check session)
+    this.setupLogoutChannel();
 
     // Initialize OIDC - required for the library to work properly
     // This checks if there's an existing valid session
     // "No token" errors are expected when user is not logged in - they're not actual errors
     this.oidcService.checkAuth().subscribe({
       next: ({ isAuthenticated }) => {
-        console.log('Auth check complete, authenticated:', isAuthenticated);
+        // Start custom check session service after authentication
+        if (isAuthenticated) {
+          this.startCheckSession();
+        }
       },
       error: (err) => {
         // Only handle real errors (network, time-skew), not "no token" situations
@@ -48,6 +68,41 @@ export class App implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.eventSubscription?.unsubscribe();
+    this.checkSessionService.stop();
+    this.logoutChannel?.close();
+  }
+
+  /**
+   * Start custom check session service as workaround for library bug.
+   * The library's built-in check session iframe has src="" bug.
+   */
+  private startCheckSession() {
+    this.checkSessionService.start();
+  }
+
+  /**
+   * Set up BroadcastChannel for instant cross-tab logout detection.
+   * This works for tabs of the same origin (same app) and is faster than check session iframe.
+   */
+  private setupLogoutChannel() {
+    if (typeof BroadcastChannel === 'undefined') {
+      return;
+    }
+
+    this.logoutChannel = new BroadcastChannel(LOGOUT_CHANNEL_NAME);
+    this.logoutChannel.onmessage = (event) => {
+      if (event.data === 'logout') {
+        this.handleSsoLogout('session-ended');
+      }
+    };
+  }
+
+  /**
+   * Broadcast logout to other tabs of the same app.
+   * Call this when user explicitly logs out.
+   */
+  broadcastLogout() {
+    this.logoutChannel?.postMessage('logout');
   }
 
   /**
@@ -65,19 +120,19 @@ export class App implements OnInit, OnDestroy {
           break;
 
         case EventTypes.CheckSessionReceived:
-          // Session check iframe detected a change at Keycloak
           if (event.value === 'changed') {
-            console.log('SSO session changed - user logged out from another app');
             this.handleSsoLogout('session-ended');
           }
           break;
 
         case EventTypes.TokenExpired:
-          console.log('Access token expired - attempting refresh');
+          // Token expired - try to refresh
+          // console.log('Access token expired - attempting refresh');
           break;
 
         case EventTypes.IdTokenExpired:
-          console.log('ID token expired');
+          // ID token expired - usually harmless if access token is still valid
+          //console.log('ID token expired');
           break;
       }
     });

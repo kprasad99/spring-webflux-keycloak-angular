@@ -6,7 +6,7 @@ import {
 
 import { HttpClient } from '@angular/common/http';
 
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 import { AuthUtils } from './auth-utils';
 import { environment } from '../../environments/environment';
@@ -41,7 +41,13 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
             AuthUtils.withDefault(customConfig.postLogoutPath, '#/sign-out'),
           ),
         ),
-        startCheckSession: AuthUtils.toBoolWithDefault(customConfig.startCheckSession, false),
+        // Disable library's broken check session - using custom CheckSessionService instead
+        startCheckSession: false,
+        checkSessionIntervalInSeconds: AuthUtils.toIntWithDefault(
+          customConfig.checkSessionIntervalInSeconds,
+          10,
+        ),
+        secureRoutes: [customConfig.authority],
         silentRenew: AuthUtils.toBoolWithDefault(customConfig.silentRenew, false),
         silentRenewUrl: AuthUtils.withDefault(
           customConfig.silentRenewUrl,
@@ -53,7 +59,11 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
         postLoginRoute: AuthUtils.withDefault(customConfig.startupRoute, '/home'),
         forbiddenRoute: AuthUtils.withDefault(customConfig.forbiddenRoute, '/forbidden'),
         unauthorizedRoute: AuthUtils.withDefault(customConfig.unauthorizedRoute, '/unauthorized'),
-        useRefreshToken: AuthUtils.toBoolWithDefault(customConfig.useRefreshToken, false),
+        useRefreshToken: AuthUtils.toBoolWithDefault(customConfig.useRefreshToken, true),
+        renewTimeBeforeTokenExpiresInSeconds: AuthUtils.toIntWithDefault(
+          customConfig.renewTimeBeforeTokenExpiresInSeconds,
+          30,
+        ),
         ignoreNonceAfterRefresh: AuthUtils.toBoolWithDefault(
           customConfig.ignoreNonceAfterRefresh,
           true,
@@ -78,7 +88,9 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
     }),
   );
   /* eslint-enable @typescript-eslint/no-explicit-any */
-  return new StsConfigHttpLoader(config$);
+  return new StsConfigHttpLoader(
+    config$.pipe(tap((config) => console.log('OIDC Config loaded:', config))),
+  );
 };
 
 export const authConfig: PassedInitialConfig = {
