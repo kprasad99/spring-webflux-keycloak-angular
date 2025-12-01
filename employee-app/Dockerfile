@@ -7,17 +7,19 @@ COPY        main.go /usr/src/go-web/main.go
 RUN         CGO_ENABLED=0 GOEXPERIMENT=jsonv2,greenteagc GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a
 
 
-FROM node:20-alpine3.20 AS npmBuilder
+FROM node:24-alpine AS npmbuilder
 
 WORKDIR /workspace
 
 RUN npm install -g pnpm
 
 COPY package.json /workspace/package.json
+COPY pnpm-lock.yaml /workspace/pnpm-lock.yaml
 RUN pnpm install
 
 #COPY . /workspace
 COPY eslint.config.js /workspace/eslint.config.js
+COPY .postcssrc.json /workspace/.postcssrc.json
 COPY ngsw-config.json /workspace/ngsw-config.json
 COPY tsconfig.app.json /workspace/tsconfig.app.json
 COPY tsconfig.json /workspace/tsconfig.json
@@ -31,12 +33,12 @@ RUN pnpm run build-prod
 FROM gcr.io/distroless/static:nonroot
 
 ENV WEB_PORT=8080
-ENV WEB_CONTEXT_PATH=/app-store/
+ENV WEB_CONTEXT_PATH=/emp-app/
 USER 65532:65532
-VOLUME /static
+
 EXPOSE ${WEB_PORT}
 
 COPY --chown=65532:65532 --from=builder /usr/src/go-web/go-web /usr/local/bin/go-web
-COPY --chown=65532:65532 --from=npmBuilder /workspace/dist/app/browser /static/
+COPY --chown=65532:65532 --from=npmbuilder /workspace/dist/app/browser /static/
 
 ENTRYPOINT  ["/usr/local/bin/go-web"]

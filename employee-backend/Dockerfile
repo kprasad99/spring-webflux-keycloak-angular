@@ -22,6 +22,10 @@ FROM amazoncorretto:25-alpine
 ENV JAVA_OPTS=""
 ENV SERVER_PORT=8080
 ENV SPRING_REACTOR_NETTY_PREFER_NATIVE="true"
+ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport \
+    -XX:+UseShenandoahGC \
+    -XX:+AlwaysPreTouch \
+    -Djava.awt.headless=true ${JAVA_OPTS}"
 
 WORKDIR /app
 VOLUME /tmp

@@ -1,0 +1,207 @@
+services:
+  traefik:
+    image: "traefik:3.6"
+    command:
+      #  - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+    - "80:80"
+    - "443:443"
+    - "8080:8080"
+    networks:
+    - k-network
+    volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  app-store:
+    image: kprasad99/app-store:v1.2.0
+    build: ./app-store
+    networks:
+    - k-network
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+        reservations:
+          memory: 64m
+    labels:
+    - traefik.enable=true
+    # HTTP router with redirect to HTTPS
+    - traefik.http.routers.app-store-web.rule=PathPrefix(`/`)
+    - traefik.http.routers.app-store-web.entrypoints=web
+    - traefik.http.routers.app-store-web.middlewares=redirect-middleware
+    # HTTPS router
+    - traefik.http.routers.app-store-websecure.rule=PathPrefix(`/`)
+    - traefik.http.routers.app-store-websecure.entrypoints=websecure
+    - traefik.http.routers.app-store-websecure.tls=true
+    # Redirect middleware (shared)
+    - traefik.http.middlewares.redirect-middleware.redirectscheme.scheme=https
+    environment:
+      GOMEMLIMIT: 100MiB
+      GOGC: off
+      LOG_PRETTY: "true"
+      app_conf_generate_base_url: "true"
+      app_conf_authority: "https://${SERVER_IP}/auth/realms/universal"
+      app_conf_client_id: "kp_prod_appstore"
+      app_conf_response_type: "code"
+      app_conf_scope: "openid profile email"
+      app_conf_start_check_session: "true"
+      app_conf_silent_renew: "true"
+      app_conf_silent_renew_path: "/silent-renew.html"
+  #     app_conf_disable_iat_offset_validation: "false"
+  emp-app:
+    image: kprasad99/employee-app:v1.2.0
+    build:
+      context: ./employee-app
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+        reservations:
+          memory: 64m
+    networks:
+    - k-network
+    labels:
+    - traefik.enable=true
+    # HTTP router with redirect to HTTPS
+    - traefik.http.routers.emp-app-web.rule=PathPrefix(`/emp-app`)
+    - traefik.http.routers.emp-app-web.entrypoints=web
+    - traefik.http.routers.emp-app-web.middlewares=redirect-middleware
+    # HTTPS router
+    - traefik.http.routers.emp-app-websecure.rule=PathPrefix(`/emp-app`)
+    - traefik.http.routers.emp-app-websecure.entrypoints=websecure
+    - traefik.http.routers.emp-app-websecure.tls=true
+    environment:
+      LOG_PRETTY: "true"
+      GOMEMLIMIT: 100MiB
+      GOGC: off
+      app_conf_generate_base_url: "true"
+      app_conf_authority: "https://${SERVER_IP}/auth/realms/universal"
+      app_conf_client_id: "kp_prod_app1"
+      app_conf_response_type: "code"
+      app_conf_scope: "openid profile email"
+      app_conf_start_check_session: "true"
+      app_conf_use_refresh_token: "true"
+      app_conf_silent_renew: "true"
+      app_conf_silent_renew_path: "/silent-renew.html"
+      app_conf_disable_iat_offset_validation: "false"
+  employee-backend:
+    image: kprasad99/employee-backend:1.0.0-alpha
+    build:
+      context: ./employee-backend
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 256m
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+    - k-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/actuator/health/readiness || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    labels:
+    - traefik.enable=true
+    # HTTP router with redirect to HTTPS
+    - traefik.http.routers.employee-backend-web.rule=PathPrefix(`/api`)
+    - traefik.http.routers.employee-backend-web.entrypoints=web
+    - traefik.http.routers.employee-backend-web.middlewares=redirect-middleware
+    # HTTPS router
+    - traefik.http.routers.employee-backend-websecure.rule=PathPrefix(`/api`)
+    - traefik.http.routers.employee-backend-websecure.entrypoints=websecure
+    - traefik.http.routers.employee-backend-websecure.tls=true
+    environment:
+      # -XX:MinRAMPercentage=30 not applicable, its max heap size required when memory is less thant 200MB
+      # 256MB 50%, 512MB 70%, 1GB 75%
+      JAVA_OPTS: "-XX:InitialRAMPercentage=70 -XX:MaxRAMPercentage=70"
+      # Since memory is < 32G enabling shenandoah GC if >32G use ZGC
+      # JAVA_TOOL_OPTIONS: "-XX:+UseZGC -XX:+ZGenerational -XX:+AlwaysPreTouch -Djava.awt.headless=true ${JAVA_OPTS}"
+      spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/auth/realms/universal
+      ingress.urls: "https://${SERVER_IP}/auth/realms/universal"
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.6
+    networks:
+    - k-network
+    ports:
+    - 18080:8080
+    volumes: 
+    - ./conf/keycloak:/opt/keycloak/data/import:z
+    command:
+      - start
+      - --import-realm
+      #- --optimized
+      #- --auto-build
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /auth/health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    labels:
+      - traefik.enable=true
+      # Service definition (shared by both routers)
+      - traefik.http.services.keycloak.loadbalancer.server.port=8080
+      # HTTP router (no redirect - for testing)
+      - traefik.http.routers.keycloak-web.rule=PathPrefix(`/auth`)
+      - traefik.http.routers.keycloak-web.entrypoints=web
+      - traefik.http.routers.keycloak-web.service=keycloak
+      # HTTPS router
+      - traefik.http.routers.keycloak-websecure.rule=PathPrefix(`/auth`)
+      - traefik.http.routers.keycloak-websecure.entrypoints=websecure
+      - traefik.http.routers.keycloak-websecure.tls=true
+      - traefik.http.routers.keycloak-websecure.service=keycloak
+    environment:
+      # https://www.keycloak.org/server/reverseproxy
+      # https://www.keycloak.org/server/hostname
+      KC_HTTP_RELATIVE_PATH: "/auth"
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      # Proxy settings (v2) - replaces deprecated KC_PROXY
+      KC_PROXY_HEADERS: "xforwarded"
+      # Hostname settings (v2) - replaces deprecated hostname-strict options
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
+      KC_HOSTNAME_DEBUG: "true"
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+      # https://www.keycloak.org/server/features
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+  postgres:
+    image: postgres:18-alpine
+    networks:
+    - k-network
+    environment:
+      POSTGRES_PASSWORD: password
+      #PGDATA: /var/lib/postgresql/data/pgdata 
+    volumes:
+    - ./conf/postgres/keycloak-init.sh:/docker-entrypoint-initdb.d/keycloak-init.sh
+    #- ./.data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+networks:
+  k-network:

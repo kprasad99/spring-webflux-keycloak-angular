@@ -12,7 +12,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,html,scss,json}\"",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
-    "serve-dev": "ng serve --configuration development --host 0.0.0.0 --ssl"
+    "serve-dev": "ng serve --configuration development --host $HOSTNAME --ssl"
   },
   "prettier": {
     "printWidth": 100,

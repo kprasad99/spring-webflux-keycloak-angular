@@ -5,14 +5,14 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build-prod": "ng build --configuration production --base-href /app-store/ --deploy-url /app-store/ --output-path dist/app/",
+    "build-prod": "ng build --configuration production --base-href /emp-app/ --deploy-url /emp-app/ --output-path dist/app/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "format": "prettier --write \"src/**/*.{ts,html,scss,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,scss,json}\"",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
-    "serve-dev": "ng serve --configuration development --host 0.0.0.0 --ssl"
+    "serve-dev": "ng serve --configuration development --host $HOSTNAME --ssl"
   },
   "prettier": {
     "printWidth": 100,
