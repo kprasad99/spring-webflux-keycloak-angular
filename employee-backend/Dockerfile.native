@@ -11,7 +11,7 @@ COPY src /app/src
 
 RUN ./gradlew clean nativeCompile
 
-FROM alpine:3.20
+FROM alpine:3.22
 
 WORKDIR /app
 
@@ -19,6 +19,7 @@ RUN apk add --no-cache gcompat
 
 COPY --from=builder /app/build/native/nativeCompile/employee-backend /app/employee-backend
 
+ENV SPRING_REACTOR_NETTY_PREFER_NATIVE="true"
 EXPOSE 8080
 VOLUME [ "/tmp" ]
 

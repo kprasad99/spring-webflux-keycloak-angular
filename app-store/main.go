@@ -1,12 +1,14 @@
 package main
 
 import (
-	"log"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/etag"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func okHandler(ctx *fiber.Ctx) error {
@@ -31,6 +33,13 @@ func getConf(ctx *fiber.Ctx) error {
 }
 
 func main() {
+	// Configure zerolog
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	// Pretty console logging for development, JSON for production
+	if os.Getenv("LOG_PRETTY") == "true" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
+
 	contextPath := os.Getenv("WEB_CONTEXT_PATH")
 	port := os.Getenv("WEB_PORT")
 	host := os.Getenv("WEB_HOST")
@@ -49,9 +58,9 @@ func main() {
 	contextPath = strings.TrimSuffix(contextPath, "/")
 
 	config := fiber.Config{
-		Prefork:           true,
-		ReduceMemoryUsage: true,
-		ETag:              true,
+		DisableStartupMessage: true,
+		Prefork:               false,
+		ReduceMemoryUsage:     true,
 	}
 
 	readBufferSize := os.Getenv("READ_BUFFER_SIZE")
@@ -72,23 +81,31 @@ func main() {
 
 	app := fiber.New(config)
 
+	// Use ETag middleware
+	app.Use(etag.New())
+
 	app.Get("/liveness", okHandler)
 	app.Get("/readiness", okHandler)
 	app.Get("/conf", getConf)
 
-	app.Static(contextPath, "/static")
+	// Serve static files - use Browse:false to prevent directory listing
+	app.Static(contextPath, "/static", fiber.Static{
+		Browse:    false,
+		ByteRange: true,
+	})
+
 	if contextPath != "" {
-		app.Get(strings.TrimSuffix(contextPath, "/")+"/conf", getConf)
+		app.Get(contextPath+"/conf", getConf)
 		app.Get("/", func(ctx *fiber.Ctx) error {
-			return ctx.Redirect(strings.TrimSuffix(contextPath, "/") + "/index.html")
+			return ctx.Redirect(contextPath + "/index.html")
 		})
 	} else {
 		app.Get("/conf", getConf)
 	}
 
-	log.Println("Started web server")
+	log.Info().Str("address", address).Msg("Starting web server")
 	if err := app.Listen(address); err != nil {
-		log.Panic("Failed to start web server", err)
+		log.Fatal().Err(err).Msg("Failed to start web server")
 	}
 
 }

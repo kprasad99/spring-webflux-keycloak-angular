@@ -1,8 +1,0 @@
-server.http2.enabled: true
-spring.threads.virtual.enabled: true
-#spring:
-# security:
-#   oauth2:
-#     resourceserver:
-#       jwt:
-#         issuer-uri: http://192.168.56.131:18080/auth/realms/universal

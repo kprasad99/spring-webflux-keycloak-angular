@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: employee-backend
+  threads:
+    virtual:
+      enabled: true
+  # Reactor Netty optimizations
+  reactor:
+    netty:
+      # Use native transport (epoll on Linux, kqueue on macOS)
+      # Requires io.netty:netty-transport-native-epoll dependency
+      # prefer-native: true
+      # Enable below if webclient is used
+      # pool:
+      #   max-connections: 500
+      #   max-idle-time: 20s
+      #   max-life-time: 60s
+server:
+  http2:
+    enabled: true
+  # Compression for responses
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain,application/javascript,text/css
+  # Netty server settings
+  netty:
+    # Connection timeout
+    connection-timeout: 30s
+    # Idle timeout for keep-alive connections
+    idle-timeout: 60s
+    # Max initial line length (for large URLs)
+    max-initial-line-length: 8KB
+    # Max header size
+    max-header-size: 16KB
+    # Enable access log (useful for debugging)
+    # accesslog:
+    #   enabled: true
+  # Shutdown settings
+  shutdown: graceful
+
+# Graceful shutdown timeout
+spring.lifecycle.timeout-per-shutdown-phase: 30s
+
+# Management/Actuator optimizations
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+  # Metrics
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+# Logging optimizations
+# logging:
+#   level:
+#     root: INFO
+#     io.github.kprasad99: DEBUG
+  # Async logging pattern (if using logback)
+  # pattern:
+  #   console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

@@ -1,26 +1,4 @@
-# FROM openjdk:21-jre-slim
-# FROM amazoncorretto:21
-
-FROM alpine:3.20 AS jvmBuilder
-
-RUN apk --no-cache add openjdk21-jdk openjdk21-jmods binutils
-
-ENV JAVA_MINIMAL="/opt/java-minimal"
-
-# build minimal JRE
-RUN /usr/lib/jvm/java-21-openjdk/bin/jlink \
-    --verbose \
-     --add-modules \
-        java.base,java.desktop,java.instrument,\
-java.management,java.management.rmi,java.naming,java.net.http,java.prefs,\
-java.security.jgss,java.security.sasl,java.sql,jdk.management.agent,jdk.management,\
-jdk.crypto.ec,jdk.unsupported \
-    --compress 2 --strip-debug --no-header-files --no-man-pages \
-#    --bind-services \
-    --release-info="add:IMPLEMENTOR=Karthik:IMPLEMENTOR_VERSION=jre-21" \
-    --output "$JAVA_MINIMAL"
-
-FROM gradle:8.8-jdk21 AS builder
+FROM gradle:9-jdk25-corretto AS builder
 
 WORKDIR /workspace
 
@@ -39,17 +17,14 @@ RUN gradle build \
     -jar build/libs/employee-backend.jar extract \
     --destination /app
 
-FROM alpine:3.20
 
-ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk
-ENV PATH="$PATH:$JAVA_HOME/bin"
+FROM amazoncorretto:25-alpine
 ENV JAVA_OPTS=""
 ENV SERVER_PORT=8080
+ENV SPRING_REACTOR_NETTY_PREFER_NATIVE="true"
 
 WORKDIR /app
 VOLUME /tmp
-
-COPY --from=jvmBuilder /opt/java-minimal "$JAVA_HOME"
 
 ARG DEPENDENCY=/app
 
@@ -58,6 +33,17 @@ COPY --from=builder ${DEPENDENCY}/spring-boot-loader/ ./
 COPY --from=builder ${DEPENDENCY}/snapshot-dependencies/ ./
 COPY --from=builder ${DEPENDENCY}/application/ ./
 
+ RUN  apk add --no-cache curl \
+      && java -XX:AOTMode=record -XX:AOTConfiguration=app.aotconf \
+        -Dspring.context.exit=onRefresh \
+        org.springframework.boot.loader.launch.JarLauncher \
+      && java -XX:AOTMode=create -XX:AOTConfiguration=app.aotconf -XX:AOTCache=/app/app.aot \
+        org.springframework.boot.loader.launch.JarLauncher
+
 EXPOSE ${SERVER_PORT}
 
-ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java", \
+    "--enable-native-access=ALL-UNNAMED", \
+    "-XX:AOTCache=app.aot", \
+    "-XX:+ExitOnOutOfMemoryError", \
+    "org.springframework.boot.loader.launch.JarLauncher"]
