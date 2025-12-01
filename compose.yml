@@ -54,6 +54,7 @@ services:
       app_conf_start_check_session: "true"
       app_conf_silent_renew: "true"
       app_conf_silent_renew_path: "/silent-renew.html"
+      app_conf_use_local_storage_logout: "true"
   #     app_conf_disable_iat_offset_validation: "false"
   emp-app:
     image: kprasad99/employee-app:v1.2.0
@@ -92,6 +93,7 @@ services:
       app_conf_silent_renew: "true"
       app_conf_silent_renew_path: "/silent-renew.html"
       app_conf_disable_iat_offset_validation: "false"
+      app_conf_use_local_storage_logout: "true"
   employee-backend:
     image: kprasad99/employee-backend:1.0.0-alpha
     build:

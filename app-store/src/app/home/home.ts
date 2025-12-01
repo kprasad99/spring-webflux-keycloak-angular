@@ -12,6 +12,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
+import { AuthService } from '../auth/auth';
+
 interface AppItem {
   title: string;
   url: string;
@@ -36,6 +38,7 @@ interface AppItem {
 export class Home implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly oidcSecurityService = inject(OidcSecurityService);
+  private readonly authService = inject(AuthService);
 
   protected readonly user = signal('');
   protected readonly apps = signal<AppItem[]>([]);
@@ -59,6 +62,6 @@ export class Home implements OnInit {
    * This will trigger SSO logout across all apps in the same realm
    */
   logout(): void {
-    this.oidcSecurityService.logoffAndRevokeTokens().subscribe();
+    this.authService.logout();
   }
 }

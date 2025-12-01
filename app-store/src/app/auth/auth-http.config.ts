@@ -6,7 +6,7 @@ import {
 
 import { HttpClient } from '@angular/common/http';
 
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { AuthUtils } from './auth-utils';
 import { environment } from '../../environments/environment';
@@ -88,9 +88,7 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
     }),
   );
   /* eslint-enable @typescript-eslint/no-explicit-any */
-  return new StsConfigHttpLoader(
-    config$.pipe(tap((config) => console.log('OIDC Config loaded:', config))),
-  );
+  return new StsConfigHttpLoader(config$);
 };
 
 export const authConfig: PassedInitialConfig = {

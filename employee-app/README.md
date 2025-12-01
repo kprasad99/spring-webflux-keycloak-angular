@@ -156,6 +156,63 @@ The application handles SSO logout events centrally in `app.ts`:
 | `logoffAndRevokeTokens()` | User clicks "Logout" in THIS app (triggers SSO logout) |
 | `logoffLocal()` | Session already ended at Keycloak (from another app) |
 
+### Cross-Tab and Cross-Subdomain Logout
+
+The application supports detecting logout events across browser tabs and even across different subdomains.
+
+#### How It Works
+
+Two services work together to detect logouts:
+
+1. **`CheckSessionService`** - Polls Keycloak's check session iframe to detect when the session ends at the identity provider (e.g., user logged out from another application).
+
+2. **`LogoutChannelService`** - Broadcasts logout events to other tabs/windows of the same application.
+
+#### BroadcastChannel vs localStorage
+
+| Method | Scope | Use Case |
+|--------|-------|----------|
+| **BroadcastChannel** (default) | Same origin only | Tabs on same domain (e.g., multiple tabs of `app.example.com`) |
+| **localStorage** | Same domain (all subdomains) | Apps on different subdomains (e.g., `app1.example.com` and `app2.example.com`) |
+
+#### Configuration
+
+In `public/oidc.json`:
+
+```json
+{
+  "checkSessionIntervalInSeconds": 3,
+  "useLocalStorageLogout": false
+}
+```
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `checkSessionIntervalInSeconds` | `3` | How often to poll Keycloak for session changes |
+| `useLocalStorageLogout` | `false` | Set to `true` to use localStorage instead of BroadcastChannel |
+
+#### When to Enable localStorage Mode
+
+Enable `useLocalStorageLogout: true` when:
+
+- You have multiple apps on different subdomains (e.g., `app1.example.com`, `app2.example.com`)
+- All apps share the same parent domain and need to detect logout from each other
+- BroadcastChannel alone doesn't work because it's limited to same-origin
+
+#### How localStorage Mode Works
+
+```
+User logs out on app1.example.com
+    ↓
+LogoutChannelService writes to localStorage: { type: 'sso-logout', timestamp: ... }
+    ↓
+'storage' event fires on ALL tabs across ALL subdomains of example.com
+    ↓
+Other apps/tabs detect the logout and call logoffLocal()
+```
+
+> **Note:** The `storage` event only fires in *other* tabs/windows, not the one that made the change. The originating tab uses direct method calls.
+
 ## Development server
 
 To start a local development server, run:

@@ -6,8 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { AuthErrorService } from './auth/auth-error.service';
 import { CheckSessionService } from './auth/check-session.service';
-
-const LOGOUT_CHANNEL_NAME = 'sso-logout';
+import { LogoutChannelService } from './auth/logout-channel.service';
 
 @Component({
   selector: 'kp-root',
@@ -19,15 +18,22 @@ export class App implements OnInit, OnDestroy {
   private readonly oidcService = inject(OidcSecurityService);
   private readonly eventService = inject(PublicEventsService);
   private readonly checkSessionService = inject(CheckSessionService);
+  private readonly logoutChannelService = inject(LogoutChannelService);
   private readonly router = inject(Router);
   private readonly authErrorService = inject(AuthErrorService);
   private eventSubscription?: Subscription;
-  private logoutChannel?: BroadcastChannel;
 
   constructor() {
     // React to session changes from custom check session service
     effect(() => {
       if (this.checkSessionService.sessionChanged()) {
+        this.handleSsoLogout('session-ended');
+      }
+    });
+
+    // React to logout broadcast from another tab/app
+    effect(() => {
+      if (this.logoutChannelService.logoutReceived()) {
         this.handleSsoLogout('session-ended');
       }
     });
@@ -37,8 +43,8 @@ export class App implements OnInit, OnDestroy {
     // Set up event listeners for SSO events
     this.setupAuthEventListeners();
 
-    // Set up BroadcastChannel for same-browser cross-tab logout (faster than check session)
-    this.setupLogoutChannel();
+    // Initialize logout channel (BroadcastChannel or localStorage based on config)
+    this.logoutChannelService.init();
 
     // Initialize OIDC - required for the library to work properly
     // This checks if there's an existing valid session
@@ -69,7 +75,7 @@ export class App implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.eventSubscription?.unsubscribe();
     this.checkSessionService.stop();
-    this.logoutChannel?.close();
+    this.logoutChannelService.stop();
   }
 
   /**
@@ -81,28 +87,11 @@ export class App implements OnInit, OnDestroy {
   }
 
   /**
-   * Set up BroadcastChannel for instant cross-tab logout detection.
-   * This works for tabs of the same origin (same app) and is faster than check session iframe.
-   */
-  private setupLogoutChannel() {
-    if (typeof BroadcastChannel === 'undefined') {
-      return;
-    }
-
-    this.logoutChannel = new BroadcastChannel(LOGOUT_CHANNEL_NAME);
-    this.logoutChannel.onmessage = (event) => {
-      if (event.data === 'logout') {
-        this.handleSsoLogout('session-ended');
-      }
-    };
-  }
-
-  /**
-   * Broadcast logout to other tabs of the same app.
+   * Broadcast logout to other tabs/apps.
    * Call this when user explicitly logs out.
    */
   broadcastLogout() {
-    this.logoutChannel?.postMessage('logout');
+    this.logoutChannelService.broadcastLogout();
   }
 
   /**
@@ -114,8 +103,6 @@ export class App implements OnInit, OnDestroy {
     this.eventSubscription = this.eventService.registerForEvents().subscribe((event) => {
       switch (event.type) {
         case EventTypes.SilentRenewFailed:
-          // Token refresh failed - session expired at Keycloak
-          console.warn('Token refresh failed - session may have ended');
           this.authErrorService.handleAuthError(event.value, event.type);
           break;
 

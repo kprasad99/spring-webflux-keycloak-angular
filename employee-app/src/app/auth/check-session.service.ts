@@ -1,16 +1,6 @@
 import { Injectable, OnDestroy, inject, isDevMode, signal } from '@angular/core';
 
-import { HttpClient } from '@angular/common/http';
-import { first } from 'rxjs';
-
-import { environment } from '../../environments/environment';
-
-/** Default check session interval in seconds */
-const DEFAULT_CHECK_SESSION_INTERVAL = 10;
-
-interface OidcConfig {
-  checkSessionIntervalInSeconds?: number;
-}
+import { CONFIG_DEFAULTS, ConfigService } from './config.service';
 
 /**
  * Custom Check Session Service
@@ -23,7 +13,7 @@ interface OidcConfig {
  */
 @Injectable({ providedIn: 'root' })
 export class CheckSessionService implements OnDestroy {
-  private readonly http = inject(HttpClient);
+  private readonly configService = inject(ConfigService);
   private checkSessionIframe: HTMLIFrameElement | null = null;
   private intervalId: ReturnType<typeof setInterval> | null = null;
   private isRunning = false;
@@ -44,21 +34,19 @@ export class CheckSessionService implements OnDestroy {
       return;
     }
 
-    // Fetch interval from oidc.json config
-    this.http
-      .get<OidcConfig>(environment.oidc_url)
-      .pipe(first())
-      .subscribe({
-        next: (config) => {
-          const intervalSeconds =
-            config?.checkSessionIntervalInSeconds ?? DEFAULT_CHECK_SESSION_INTERVAL;
-          this.initCheckSession(intervalSeconds);
-        },
-        error: () => {
-          // Fallback to default if config fetch fails
-          this.initCheckSession(DEFAULT_CHECK_SESSION_INTERVAL);
-        },
-      });
+    // Get interval from shared config service
+    this.configService.getConfig().subscribe({
+      next: (config) => {
+        const intervalSeconds =
+          (config?.['checkSessionIntervalInSeconds'] as number) ??
+          CONFIG_DEFAULTS.checkSessionIntervalInSeconds;
+        this.initCheckSession(intervalSeconds);
+      },
+      error: () => {
+        // Fallback to default if config fetch fails
+        this.initCheckSession(CONFIG_DEFAULTS.checkSessionIntervalInSeconds);
+      },
+    });
   }
 
   private initCheckSession(intervalSeconds: number): void {

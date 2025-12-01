@@ -1,19 +1,14 @@
+import { defer, map } from 'rxjs';
+
 import { Injectable, inject } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { map } from 'rxjs';
 
-const LOGOUT_CHANNEL_NAME = 'sso-logout';
+import { LogoutChannelService } from './logout-channel.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly oidcService = inject(OidcSecurityService);
-  private readonly logoutChannel?: BroadcastChannel;
-
-  constructor() {
-    if (typeof BroadcastChannel !== 'undefined') {
-      this.logoutChannel = new BroadcastChannel(LOGOUT_CHANNEL_NAME);
-    }
-  }
+  private readonly logoutChannelService = inject(LogoutChannelService);
 
   isAuthenticated$ = this.oidcService.isAuthenticated$.pipe(
     map(({ isAuthenticated }) => isAuthenticated),
@@ -31,10 +26,16 @@ export class AuthService {
     this.oidcService.authorize();
   }
 
+  /**
+   * User-initiated logout - broadcasts to other tabs and revokes tokens.
+   * This will trigger SSO logout across all apps in the same realm.
+   */
   logout() {
-    // Broadcast to other tabs before logging out
-    this.logoutChannel?.postMessage('logout');
-    this.oidcService.logoff().subscribe();
+    return defer(() => {
+      // Broadcast to other tabs BEFORE logging out
+      this.logoutChannelService.broadcastLogout();
+      return this.oidcService.logoffAndRevokeTokens();
+    });
   }
 
   // For SSO - check if user is authenticated in another app
