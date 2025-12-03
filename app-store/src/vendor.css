@@ -1,0 +1,14 @@
+/* Define CSS layer order for proper style precedence */
+@layer tailwind-base, tailwind-utilities;
+
+/* Tailwind CSS v4 */
+@import 'tailwindcss';
+
+/* Import Roboto font offline */
+@import '@fontsource/roboto/300.css'; /* Light */
+@import '@fontsource/roboto/400.css'; /* Regular */
+@import '@fontsource/roboto/500.css'; /* Medium */
+@import '@fontsource/roboto/700.css'; /* Bold */
+
+/* Import Material Symbols Outlined (variable font) */
+@import '@fontsource-variable/material-symbols-outlined';

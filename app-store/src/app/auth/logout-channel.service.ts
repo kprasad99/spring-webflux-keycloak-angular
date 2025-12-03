@@ -1,6 +1,6 @@
-import { Injectable, OnDestroy, inject, signal } from '@angular/core';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
 
-import { CONFIG_DEFAULTS, ConfigService } from './config.service';
+import { CONFIG_DEFAULTS, ConfigService } from '../config.service';
 
 /** Channel name for BroadcastChannel (same-origin only) */
 const BROADCAST_CHANNEL_NAME = 'sso-logout';

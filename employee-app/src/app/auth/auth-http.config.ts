@@ -1,19 +1,19 @@
+import { HttpClient } from '@angular/common/http';
+
+import { map } from 'rxjs/operators';
+
 import {
   PassedInitialConfig,
   StsConfigHttpLoader,
   StsConfigLoader,
 } from 'angular-auth-oidc-client';
 
-import { HttpClient } from '@angular/common/http';
-
-import { map } from 'rxjs/operators';
-
 import { AuthUtils } from './auth-utils';
 import { environment } from '../../environments/environment';
 
 export const httpLoaderFactory = (httpClient: HttpClient) => {
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  const config$ = httpClient.get<any>(environment.oidc_url).pipe(
+  const config$ = httpClient.get<any>(environment.config_url).pipe(
     map((v) => AuthUtils.toCamel(v)),
 
     map((customConfig: any) => {
@@ -57,7 +57,7 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
           ),
         ),
         postLoginRoute: AuthUtils.withDefault(customConfig.startupRoute, '/home'),
-        forbiddenRoute: AuthUtils.withDefault(customConfig.forbiddenRoute, '/unauthorized'),
+        forbiddenRoute: AuthUtils.withDefault(customConfig.forbiddenRoute, '/forbidden'),
         unauthorizedRoute: AuthUtils.withDefault(customConfig.unauthorizedRoute, '/unauthorized'),
         useRefreshToken: AuthUtils.toBoolWithDefault(customConfig.useRefreshToken, true),
         renewTimeBeforeTokenExpiresInSeconds: AuthUtils.toIntWithDefault(

@@ -1,15 +1,15 @@
-import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   computed,
   inject,
+  OnInit,
   signal,
 } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
@@ -44,12 +44,12 @@ export class AuthError implements OnInit {
       iconColor: 'text-amber-500',
       title: 'Clock Synchronization Error',
       message:
-        "Your device's clock appears to be out of sync with the server. This prevents secure authentication.",
+        'There is a time difference between your device and the authentication server. This prevents secure authentication.',
       suggestions: [
-        "Open your device's Date & Time settings",
-        'Enable "Set time automatically" or sync with network time',
-        'Wait a few seconds for the time to synchronize',
-        'Click "Retry Authentication" below',
+        "Check your device's Date & Time settings and enable automatic time sync",
+        'Wait a few seconds for the time to synchronize, then retry',
+        'If the issue persists, the server time may be out of sync - contact your system administrator',
+        'System administrators: Verify NTP is configured correctly on the authentication server',
       ],
       showRetry: true,
     },
@@ -58,11 +58,13 @@ export class AuthError implements OnInit {
       iconColor: 'text-red-500',
       title: 'Network Connection Error',
       message:
-        'Unable to connect to the authentication server. Please check your internet connection.',
+        'Unable to connect to the authentication server. This could be due to network issues or SSL certificate problems.',
       suggestions: [
-        'Check your internet connection',
-        'Verify you are connected to the correct network',
-        'Try disabling VPN if enabled',
+        'Check your internet connection and verify you are connected to the correct network',
+        'If using a self-signed SSL certificate, open the authentication server URL in a new browser tab and accept the certificate',
+        'Check browser console (F12 → Console) for SSL/certificate errors',
+        'Verify VPN settings if applicable',
+        'Verify firewall settings are not blocking access',
         'Contact your network administrator if the problem persists',
       ],
       showRetry: true,

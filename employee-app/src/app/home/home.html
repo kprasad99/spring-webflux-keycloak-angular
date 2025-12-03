@@ -1,4 +1,4 @@
-<div class="flex flex-col h-full gap-[5px]">
+<div class="flex flex-col h-full gap-2">
   <mat-toolbar class="toolbar-primary">
     <span>Employee Portal</span>
     <div class="flex-1"></div>
@@ -21,8 +21,10 @@
       </mat-menu>
     </div>
   </mat-toolbar>
-  <div class="flex-1 overflow-auto">
-    <router-outlet></router-outlet>
+  <div class="flex-1 min-h-0 overflow-auto px-4 py-2 bg-(--mat-sys-surface)">
+    <div [animate.enter]="'route-enter'">
+      <router-outlet #outlet="outlet"></router-outlet>
+    </div>
   </div>
   <mat-toolbar class="toolbar-primary">
     <div class="flex flex-row items-center justify-center w-full">

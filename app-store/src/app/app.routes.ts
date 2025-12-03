@@ -1,11 +1,12 @@
 import { Routes } from '@angular/router';
+
 import { authGuard } from './auth/auh-guard';
 
 export const routes: Routes = [
   {
     path: 'home',
     canActivate: [authGuard],
-    loadComponent: () => import('./home/home').then((m) => m.Home),
+    loadChildren: () => import('./home/home.routes').then((m) => m.HomeRoutes),
   },
   { path: 'sso', loadComponent: () => import('./sso/sso').then((m) => m.Sso) },
   { path: 'sign-out', loadComponent: () => import('./sign-out/sign-out').then((m) => m.SignOut) },

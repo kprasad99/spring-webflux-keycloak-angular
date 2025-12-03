@@ -1,6 +1,6 @@
-import { Injectable, OnDestroy, inject, isDevMode, signal } from '@angular/core';
+import { inject, Injectable, isDevMode, OnDestroy, signal } from '@angular/core';
 
-import { CONFIG_DEFAULTS, ConfigService } from './config.service';
+import { CONFIG_DEFAULTS, ConfigService } from '../config.service';
 
 /**
  * Custom Check Session Service

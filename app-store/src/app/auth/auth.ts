@@ -1,6 +1,7 @@
+import { inject, Injectable } from '@angular/core';
+
 import { defer, map } from 'rxjs';
 
-import { Injectable, inject } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 import { LogoutChannelService } from './logout-channel.service';

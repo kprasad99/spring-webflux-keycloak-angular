@@ -1,41 +1,38 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+
 import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { MatRippleModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
-
-import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { RouterOutlet } from '@angular/router';
 
-import { AuthService } from '../auth/auth';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 
-interface AppItem {
-  title: string;
-  url: string;
-}
+import { AuthService } from '../auth/auth';
 
 @Component({
   selector: 'kp-home',
   imports: [
     CommonModule,
-    MatToolbarModule,
-    MatFormFieldModule,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
-    MatCardModule,
+    MatToolbarModule,
+    MatRippleModule,
     MatDividerModule,
     RouterOutlet,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'block h-screen',
+  },
 })
 export class Home implements OnInit {
   private readonly http = inject(HttpClient);
@@ -43,7 +40,6 @@ export class Home implements OnInit {
   private readonly authService = inject(AuthService);
 
   protected readonly user = signal('');
-  protected readonly apps = signal<AppItem[]>([]);
 
   ngOnInit(): void {
     // Get user data from the already authenticated session

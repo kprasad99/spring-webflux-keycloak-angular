@@ -5,7 +5,8 @@
     "packageManager": "pnpm",
     "schematicCollections": [
       "angular-eslint"
-    ]
+    ],
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -34,19 +35,12 @@
               "src/silent-renew.html"
             ],
             "styles": [
+              "src/vendor.css",
               "src/styles.scss"
             ]
           },
           "configurations": {
             "production": {
-              "optimization": {
-                "scripts": true,
-                "styles": {
-                  "minify": true,
-                  "inlineCritical": false
-                },
-                "fonts": true
-              },
               "budgets": [
                 {
                   "type": "initial",
@@ -71,7 +65,18 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "assets": [
+                {
+                  "glob": "**/*",
+                  "input": "public"
+                },
+                {
+                  "glob": "**/*",
+                  "input": "dev/public"
+                },
+                "src/silent-renew.html"
+              ]
             }
           },
           "defaultConfiguration": "production"

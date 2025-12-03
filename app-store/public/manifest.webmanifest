@@ -1,5 +1,5 @@
 {
-  "name": "app-store",
+  "name": "App Store",
   "short_name": "app-store",
   "display": "standalone",
   "scope": "./",

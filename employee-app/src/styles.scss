@@ -4,9 +4,37 @@
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
-@use 'tailwindcss';
+@use './animation.router' as animation;
+
+// Material Symbols CSS rules required for mat-icon to render properly
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined Variable';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  // Variable font settings (optional customization)
+  font-variation-settings:
+    'FILL' 0,
+    // 0 = outlined, 1 = filled
+    'wght' 400,
+    // weight: 100-700
+    'GRAD' 0,
+    // grade: -25 to 200
+    'opsz' 24; // optical size: 20-48
+}
 
 html {
+  color-scheme: light dark;
   @include mat.theme(
     (
       color: (
@@ -36,7 +64,6 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
-
 /* You can add global styles to this file, and also import other style files */
 
 html,

@@ -1,11 +1,12 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
 
-import { Observable, first, map, shareReplay } from 'rxjs';
+import { first, map, Observable, shareReplay } from 'rxjs';
 
-import { AuthUtils } from './auth-utils';
-import { environment } from '../../environments/environment';
+import camelCase from 'lodash-es/camelCase';
+
+import { environment } from '../environments/environment';
 
 /** Generic config type - equivalent to map[string]any in Go */
 export type AppConfig = Record<string, unknown>;
@@ -35,8 +36,8 @@ export class ConfigService {
    */
   getConfig(): Observable<AppConfig> {
     if (!this.config$) {
-      this.config$ = this.http.get<AppConfig>(environment.oidc_url).pipe(
-        map((v) => AuthUtils.toCamel(v)),
+      this.config$ = this.http.get<AppConfig>(environment.config_url).pipe(
+        map((v) => this.toCamel(v)),
         first(),
         shareReplay({ bufferSize: 1, refCount: false }),
       );
@@ -59,5 +60,21 @@ export class ConfigService {
    */
   clearCache(): void {
     this.config$ = undefined;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  toCamel(obj: any): any {
+    if (Array.isArray(obj)) {
+      return obj.map((v) => this.toCamel(v));
+    } else if (obj !== null && obj.constructor === Object) {
+      return Object.keys(obj).reduce(
+        (result, key) => ({
+          ...result,
+          [camelCase(key)]: this.toCamel(obj[key]),
+        }),
+        {},
+      );
+    }
+    return obj;
   }
 }

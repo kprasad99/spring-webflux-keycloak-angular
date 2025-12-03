@@ -81,12 +81,14 @@ func main() {
 
 	app := fiber.New(config)
 
-	// Use ETag middleware
-	app.Use(etag.New())
-
+	// Register health endpoints FIRST, before any middleware
+	// This ensures they respond quickly without middleware overhead
 	app.Get("/liveness", okHandler)
 	app.Get("/readiness", okHandler)
 	app.Get("/conf", getConf)
+
+	// Use ETag middleware
+	app.Use(etag.New())
 
 	// Serve static files - use Browse:false to prevent directory listing
 	app.Static(contextPath, "/static", fiber.Static{
@@ -104,6 +106,24 @@ func main() {
 	}
 
 	log.Info().Str("address", address).Msg("Starting web server")
+
+	// Use Hooks to log when server is actually ready to accept connections
+	app.Hooks().OnListen(func(listenData fiber.ListenData) error {
+		if fiber.IsChild() {
+			return nil
+		}
+		scheme := "http"
+		if listenData.TLS {
+			scheme = "https"
+		}
+		log.Info().
+			Str("scheme", scheme).
+			Str("host", listenData.Host).
+			Str("port", listenData.Port).
+			Msg("Server is ready to accept connections")
+		return nil
+	})
+
 	if err := app.Listen(address); err != nil {
 		log.Fatal().Err(err).Msg("Failed to start web server")
 	}

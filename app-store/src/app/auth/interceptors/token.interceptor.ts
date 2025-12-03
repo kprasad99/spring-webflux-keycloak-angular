@@ -1,5 +1,6 @@
-import { HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
+
+import { HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 
 import { switchMap, take } from 'rxjs';
 
@@ -16,7 +17,6 @@ const PROTECTED_API_PATHS = ['/api'];
  */
 const isProtectedApiRequest = (url: string): boolean =>
   PROTECTED_API_PATHS.some((path) => url.includes(path));
-
 /**
  * Token interceptor that adds the Bearer token to outgoing HTTP requests.
  *

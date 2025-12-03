@@ -5,6 +5,7 @@ const tseslint = require("typescript-eslint");
 const angular = require("angular-eslint");
 const prettierPlugin = require("eslint-plugin-prettier");
 const prettierConfig = require("eslint-config-prettier");
+const importPlugin = require("eslint-plugin-import");
 
 
 module.exports = defineConfig([
@@ -12,6 +13,7 @@ module.exports = defineConfig([
     files: ["**/*.ts"],
     plugins: {
       prettier: prettierPlugin,
+      import: importPlugin,
     },
     extends: [
       eslint.configs.recommended,
@@ -21,6 +23,12 @@ module.exports = defineConfig([
       prettierConfig,
     ],
     processor: angular.processInlineTemplates,
+    settings: {
+      "import/resolver": {
+        typescript: true,
+        node: true,
+      },
+    },
     rules: {
       "@angular-eslint/directive-selector": [
         "error",
@@ -38,22 +46,71 @@ module.exports = defineConfig([
           style: "kebab-case",
         },
       ],
-      "sort-imports": [
-          "error",
-          {
-            "ignoreCase": false,
-            "ignoreDeclarationSort": false,
-            "ignoreMemberSort": false,
-            "memberSyntaxSortOrder": [
-              "none",
-              "all",
-              "multiple",
-              "single"
-            ],
-            "allowSeparatedGroups": true
+      "import/order": [
+        "error",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            ["parent", "sibling", "index"],
+          ],
+          pathGroups: [
+            {
+              pattern: "@angular/core",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "@angular/common",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "@angular/**",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "@angular/material/**",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "rxjs",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "rxjs/**",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "primeng/**",
+              group: "external",
+              position: "before",
+            },
+          ],
+          pathGroupsExcludedImportTypes: ["builtin"],
+          "newlines-between": "always",
+          alphabetize: {
+            order: "asc",
+            caseInsensitive: true,
           },
-        ],
-      "prettier/prettier": "error"
+        },
+      ],
+      "sort-imports": [
+        "error",
+        {
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+          ignoreMemberSort: false,
+          allowSeparatedGroups: true,
+        },
+      ],
+      "import/no-duplicates": ["error", { "prefer-inline": false }],
+      "prettier/prettier": "error",
     },
   },
   {

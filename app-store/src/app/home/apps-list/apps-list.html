@@ -1,0 +1,25 @@
+<div class="flex-1 overflow-auto">
+  <div class="flex flex-wrap h-full items-center justify-center gap-4 p-4">
+    @for (app of apps(); track app.url) {
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>{{ app.title }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="p-4"></div>
+        </mat-card-content>
+        <mat-card-actions class="flex justify-center">
+          <a
+            [href]="app.url"
+            target="_blank"
+            mat-flat-button
+            class="mat-accent"
+            aria-label="Open app"
+          >
+            <mat-icon>arrow_right_alt</mat-icon>
+          </a>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+</div>

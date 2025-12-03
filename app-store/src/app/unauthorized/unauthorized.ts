@@ -1,18 +1,24 @@
-import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   computed,
   inject,
+  OnInit,
   signal,
 } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
-type UnauthorizedReason = 'forbidden' | 'session-expired' | 'session-ended' | 'default';
+type UnauthorizedReason =
+  | 'forbidden'
+  | 'session-expired'
+  | 'session-ended'
+  | 'not-authenticated'
+  | 'default';
 
 interface ReasonConfig {
   icon: string;
@@ -58,6 +64,13 @@ export class Unauthorized implements OnInit {
       title: 'Session Ended',
       message:
         'Your session was ended, possibly from another application or browser tab. Please sign in again to continue.',
+      showLogin: true,
+    },
+    'not-authenticated': {
+      icon: 'login',
+      iconColor: 'text-blue-500',
+      title: 'Sign In Required',
+      message: 'Please sign in to access this application.',
       showLogin: true,
     },
     default: {

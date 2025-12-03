@@ -1,13 +1,14 @@
+import { inject } from '@angular/core';
+
 import {
   HttpErrorResponse,
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
 } from '@angular/common/http';
-import { catchError, throwError } from 'rxjs';
-
 import { Router } from '@angular/router';
-import { inject } from '@angular/core';
+
+import { catchError, throwError } from 'rxjs';
 
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 

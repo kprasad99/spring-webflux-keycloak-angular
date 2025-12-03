@@ -1,0 +1,31 @@
+// Route animations using animate.enter and animate.leave
+// These classes are applied by Angular during route transitions
+@keyframes route-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes route-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+.route-enter {
+  animation: route-slide-in 500ms ease-out;
+}
+
+.route-leave {
+  animation: route-slide-out 500ms ease-out;
+}

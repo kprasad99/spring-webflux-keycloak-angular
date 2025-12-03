@@ -1,9 +1,10 @@
+
 {
   "arrow-body-style": "off",
   "prefer-arrow-callback": "off",
   "printWidth": 120,
   "singleQuote": true,
-  "trailingComma": "none",
+  "trailingComma": "all",
   "endOfLine": "auto",
   "useTabs": false,
   "bracketSameLine": true,
