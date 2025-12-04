@@ -13,7 +13,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
-type ErrorReason = 'time-skew' | 'network' | 'generic';
+type ErrorReason = 'time-skew' | 'network' | 'generic' | 'idle';
 
 interface ErrorConfig {
   icon: string;
@@ -78,6 +78,19 @@ export class AuthError implements OnInit {
         'Clear your browser cache and cookies',
         'Try using a different browser',
         'Contact support if the problem persists',
+      ],
+      showRetry: true,
+    },
+    idle: {
+      icon: 'hourglass_empty',
+      iconColor: 'text-amber-500',
+      title: 'Session Timed Out',
+      message:
+        'You have been logged out due to inactivity. This helps protect your account and sensitive data.',
+      suggestions: [
+        'Click "Sign In Again" to start a new session',
+        'Make sure to save your work periodically',
+        'If you need longer sessions, contact your administrator',
       ],
       showRetry: true,
     },

@@ -1,5 +1,7 @@
 import { inject, Injectable, isDevMode, OnDestroy, signal } from '@angular/core';
 
+import { take } from 'rxjs/operators';
+
 import { CONFIG_DEFAULTS, ConfigService } from '../config.service';
 
 /**
@@ -31,28 +33,37 @@ export class CheckSessionService implements OnDestroy {
    */
   start(): void {
     if (this.isRunning) {
+      if (this.debug) {
+        console.log('[CheckSession] Already running, skipping start');
+      }
       return;
     }
 
     // Get interval from shared config service
-    this.configService.getConfig().subscribe({
-      next: (config) => {
-        const intervalSeconds =
-          (config?.['checkSessionIntervalInSeconds'] as number) ??
-          CONFIG_DEFAULTS.checkSessionIntervalInSeconds;
-        this.initCheckSession(intervalSeconds);
-      },
-      error: () => {
-        // Fallback to default if config fetch fails
-        this.initCheckSession(CONFIG_DEFAULTS.checkSessionIntervalInSeconds);
-      },
-    });
+    this.configService
+      .getConfig()
+      .pipe(take(1))
+      .subscribe({
+        next: (config) => {
+          const intervalSeconds =
+            (config?.['checkSessionIntervalInSeconds'] as number) ??
+            CONFIG_DEFAULTS.checkSessionIntervalInSeconds;
+          this.initCheckSession(intervalSeconds);
+        },
+        error: () => {
+          // Fallback to default if config fetch fails
+          this.initCheckSession(CONFIG_DEFAULTS.checkSessionIntervalInSeconds);
+        },
+      });
   }
 
   private initCheckSession(intervalSeconds: number): void {
     // Get config from storage
     const configKey = Object.keys(sessionStorage).find((k) => k.startsWith('0-'));
     if (!configKey) {
+      if (this.debug) {
+        console.warn('[CheckSession] No OIDC config found in sessionStorage');
+      }
       return;
     }
 
@@ -62,15 +73,33 @@ export class CheckSessionService implements OnDestroy {
       this.sessionState = stored?.session_state;
       this.clientId = configKey.replace('0-', '');
 
-      if (!this.checkSessionIframeUrl || !this.sessionState) {
+      if (!this.checkSessionIframeUrl) {
+        if (this.debug) {
+          console.warn('[CheckSession] No checkSessionIframe URL found in config');
+        }
+        return;
+      }
+
+      if (!this.sessionState) {
+        if (this.debug) {
+          console.warn('[CheckSession] No session_state found in config');
+        }
         return;
       }
 
       this.initIframe();
       this.startPolling(intervalSeconds);
       this.isRunning = true;
-    } catch {
-      // Failed to start check session - non-critical
+
+      if (this.debug) {
+        console.log(
+          `[CheckSession] Started polling every ${intervalSeconds}s for client: ${this.clientId}`,
+        );
+      }
+    } catch (e) {
+      if (this.debug) {
+        console.error('[CheckSession] Failed to initialize:', e);
+      }
     }
   }
 
@@ -85,6 +114,10 @@ export class CheckSessionService implements OnDestroy {
     }
     window.removeEventListener('message', this.handleMessage);
     this.isRunning = false;
+
+    if (this.debug) {
+      console.log('[CheckSession] Stopped');
+    }
   }
 
   ngOnDestroy(): void {

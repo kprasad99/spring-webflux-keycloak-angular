@@ -15,6 +15,7 @@ import {
 
 import { AuthErrorService } from './auth/auth-error.service';
 import { CheckSessionService } from './auth/check-session.service';
+import { IdleService } from './auth/idle.service';
 import { LogoutChannelService } from './auth/logout-channel.service';
 
 @Component({
@@ -27,6 +28,7 @@ export class App implements OnInit, OnDestroy {
   private readonly oidcService = inject(OidcSecurityService);
   private readonly eventService = inject(PublicEventsService);
   private readonly checkSessionService = inject(CheckSessionService);
+  private readonly idleService = inject(IdleService);
   private readonly logoutChannelService = inject(LogoutChannelService);
   private readonly router = inject(Router);
   private readonly authErrorService = inject(AuthErrorService);
@@ -72,6 +74,9 @@ export class App implements OnInit, OnDestroy {
         if (isAuthenticated) {
           // Start custom check session service after authentication
           this.startCheckSession();
+
+          // Start idle monitoring (timeout configurable, default 15 minutes)
+          this.startIdleMonitoring();
 
           // If this was a callback (had code=), redirect to intended destination
           if (hasCallbackParams) {
@@ -187,6 +192,7 @@ export class App implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.eventSubscription?.unsubscribe();
     this.checkSessionService.stop();
+    this.idleService.stop();
     this.logoutChannelService.stop();
   }
 
@@ -196,6 +202,17 @@ export class App implements OnInit, OnDestroy {
    */
   private startCheckSession() {
     this.checkSessionService.start();
+  }
+
+  /**
+   * Start idle monitoring service.
+   * Logs out user after period of inactivity (default: 15 minutes).
+   * Configure timeout via idleTimeoutMinutes in oidc.json.
+   */
+  private startIdleMonitoring() {
+    // TODO: Read timeout from config if needed
+    // For now, use default 15 minutes
+    this.idleService.start();
   }
 
   /**

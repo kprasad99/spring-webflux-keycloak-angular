@@ -25,8 +25,8 @@
     <div class="flex flex-col gap-3">
       @if (config().showRetry) {
         <button mat-raised-button class="mat-primary" (click)="retry()" class="gap-2">
-          <mat-icon>refresh</mat-icon>
-          Retry Authentication
+          <mat-icon>{{ reason() === 'idle' ? 'login' : 'refresh' }}</mat-icon>
+          {{ reason() === 'idle' ? 'Sign In Again' : 'Retry Authentication' }}
         </button>
       }
       <a mat-stroked-button routerLink="/" class="gap-2">
