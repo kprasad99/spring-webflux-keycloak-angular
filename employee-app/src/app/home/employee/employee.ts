@@ -1,16 +1,16 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+
+import { SelectionModel } from '@angular/cdk/collections';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { SelectionModel } from '@angular/cdk/collections';
-
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
-import { EmployeeDialog } from '../employee-dialog/employee-dialog';
 import { EmployeeService } from './employee.service';
 import { HasAdminPipe } from '../../has-admin-pipe';
+import { EmployeeDialog } from '../employee-dialog/employee-dialog';
 
 export interface EmployeeData {
   id: number;
