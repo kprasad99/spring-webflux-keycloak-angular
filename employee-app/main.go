@@ -85,7 +85,14 @@ func main() {
 	// This ensures they respond quickly without middleware overhead
 	app.Get("/liveness", okHandler)
 	app.Get("/readiness", okHandler)
-	app.Get("/conf", getConf)
+	if contextPath != "" {
+		app.Get(contextPath+"/conf", getConf)
+		app.Get("/", func(ctx *fiber.Ctx) error {
+			return ctx.Redirect(contextPath + "/index.html")
+		})
+	} else {
+		app.Get("/conf", getConf)
+	}
 
 	// Use ETag middleware
 	app.Use(etag.New())
@@ -95,15 +102,6 @@ func main() {
 		Browse:    false,
 		ByteRange: true,
 	})
-
-	if contextPath != "" {
-		app.Get(contextPath+"/conf", getConf)
-		app.Get("/", func(ctx *fiber.Ctx) error {
-			return ctx.Redirect(contextPath + "/index.html")
-		})
-	} else {
-		app.Get("/conf", getConf)
-	}
 
 	log.Info().Str("address", address).Msg("Starting web server")
 
