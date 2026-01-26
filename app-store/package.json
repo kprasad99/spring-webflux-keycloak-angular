@@ -43,7 +43,7 @@
     "@fontsource-variable/material-symbols-outlined": "^5.2.30",
     "@fontsource/roboto": "^5.2.9",
     "angular-auth-oidc-client": "21.0.0",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.17.23",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.17",
     "tslib": "^2.3.0"
