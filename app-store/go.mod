@@ -3,7 +3,7 @@ module github.com/kprasad99/go-web
 go 1.25
 
 require (
-	github.com/gofiber/fiber/v2 v2.52.10
+	github.com/gofiber/fiber/v2 v2.52.11
 	github.com/rs/zerolog v1.34.0
 )
 
