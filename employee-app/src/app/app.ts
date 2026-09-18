@@ -6,13 +6,13 @@ import { Router, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
-  AbstractSecurityStorage,
   EventTypes,
   OidcSecurityService,
   PublicEventsService,
   ValidationResult,
 } from 'angular-auth-oidc-client';
 
+import { AuthService } from './auth/auth';
 import { AuthErrorService } from './auth/auth-error.service';
 import { CheckSessionService } from './auth/check-session.service';
 import { IdleService } from './auth/idle.service';
@@ -26,6 +26,7 @@ import { LogoutChannelService } from './auth/logout-channel.service';
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal('Employee Portal');
   private readonly oidcService = inject(OidcSecurityService);
+  private readonly authService = inject(AuthService);
   private readonly eventService = inject(PublicEventsService);
   private readonly checkSessionService = inject(CheckSessionService);
   private readonly idleService = inject(IdleService);
@@ -33,7 +34,6 @@ export class App implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly authErrorService = inject(AuthErrorService);
   private readonly dialog = inject(MatDialog);
-  private readonly storageService = inject(AbstractSecurityStorage);
   private eventSubscription?: Subscription;
 
   // Track validation result from auth events
@@ -66,10 +66,10 @@ export class App implements OnInit, OnDestroy {
     // are in the URL BEFORE the hash: https://host/?code=xxx&state=yyy#/sso
     // We must capture and process them here before Angular routing strips them away
     const currentUrl = globalThis.location.href;
-    const hasCallbackParams = this.hasOidcCallbackParams(currentUrl);
+    const hasCallbackParams = this.authService.hasOidcCallbackParams(currentUrl);
 
     // Initialize OIDC - pass the full URL to process any callback params
-    this.oidcService.checkAuth(currentUrl).subscribe({
+    this.authService.checkAuth(currentUrl).subscribe({
       next: ({ isAuthenticated }) => {
         if (isAuthenticated) {
           // Start custom check session service after authentication
@@ -77,13 +77,6 @@ export class App implements OnInit, OnDestroy {
 
           // Start idle monitoring (timeout configurable, default 15 minutes)
           this.startIdleMonitoring();
-
-          // If this was a callback (had code=), redirect to intended destination
-          if (hasCallbackParams) {
-            const storedRedirect = this.storageService.read('redirect');
-            const redirectUrl = this.isValidRedirectUrl(storedRedirect) ? storedRedirect : '/home';
-            this.router.navigateByUrl(redirectUrl);
-          }
         } else if (hasCallbackParams) {
           // Had callback params but not authenticated - auth failed
           this.handleAuthFailure();
@@ -119,20 +112,6 @@ export class App implements OnInit, OnDestroy {
           }
         }
       },
-    });
-  }
-
-  /**
-   * Check if URL contains OIDC callback parameters
-   * Uses same regex pattern as the OIDC library's getUrlParameter method
-   * which handles params in query string (?), as additional params (&), or after hash (#)
-   * This covers both: ?code=xxx&state=yyy#/sso and #/sso?code=xxx&state=yyy
-   */
-  private hasOidcCallbackParams(url: string): boolean {
-    const callbackParams = ['code', 'state', 'token', 'id_token', 'error'];
-    return callbackParams.some((param) => {
-      const regex = new RegExp('[\\?&#]' + param + '=([^&#]*)');
-      return regex.test(url);
     });
   }
 
@@ -175,18 +154,6 @@ export class App implements OnInit, OnDestroy {
         replaceUrl: true,
       });
     }
-  }
-
-  /**
-   * Validate redirect URL to prevent infinite loops
-   */
-  private isValidRedirectUrl(url: string | null | undefined): url is string {
-    if (!url) {
-      return false;
-    }
-    const invalidPaths = ['/sso', '/sign-out', '/unauthorized', '/auth-error'];
-    const lowerUrl = url.toLowerCase();
-    return !invalidPaths.some((path) => lowerUrl === path || lowerUrl.startsWith(`${path}?`));
   }
 
   ngOnDestroy() {

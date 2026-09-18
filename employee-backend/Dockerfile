@@ -13,8 +13,9 @@ RUN gradle dependencies
 COPY src /workspace/src
 
 RUN gradle build \
-    && java -Djarmode=layertools \
+    && java -Djarmode=tools \
     -jar build/libs/employee-backend.jar extract \
+    --layers --launcher \
     --destination /app
 
 

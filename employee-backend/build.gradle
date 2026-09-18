@@ -79,7 +79,7 @@ graalvmNative {
 	binaries {
         main {
             javaLauncher = javaToolchains.launcherFor {
-                languageVersion = JavaLanguageVersion.of(21)
+                languageVersion = JavaLanguageVersion.of(25)
                 vendor = JvmVendorSpec.matching("Oracle Corporation")
             }
             // GraalVM Enterprise only https://www.graalvm.org/22.0/reference-manual/native-image/Options/

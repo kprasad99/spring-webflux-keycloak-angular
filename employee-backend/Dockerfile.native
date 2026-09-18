@@ -11,7 +11,7 @@ COPY src /app/src
 
 RUN ./gradlew clean nativeCompile
 
-FROM alpine:3.22
+FROM alpine:3.24
 
 WORKDIR /app
 

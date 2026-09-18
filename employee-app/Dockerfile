@@ -1,13 +1,13 @@
-FROM        golang:1.25-alpine AS builder
+FROM        golang:1.27-alpine AS builder
 WORKDIR     /usr/src/go-web
 COPY        go.mod /usr/src/go-web/go.mod
 COPY        go.sum /usr/src/go-web/go.sum
 RUN         go mod download
 COPY        main.go /usr/src/go-web/main.go
-RUN         CGO_ENABLED=0 GOEXPERIMENT=jsonv2,greenteagc GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a
+RUN         CGO_ENABLED=0 GOEXPERIMENT=jsonv2,greenteagc GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -a
 
 
-FROM node:24-alpine AS npmbuilder
+FROM node:24-slim AS npmbuilder
 
 WORKDIR /workspace
 

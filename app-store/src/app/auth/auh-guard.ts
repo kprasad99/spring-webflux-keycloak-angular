@@ -6,16 +6,26 @@ import { map, take } from 'rxjs';
 
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
-export const authGuard: CanActivateFn = () => {
+import { AuthService } from './auth';
+
+export const authGuard: CanActivateFn = (_route, state) => {
+  const authService = inject(AuthService);
   const oidcService = inject(OidcSecurityService);
 
-  return oidcService.isAuthenticated$.pipe(
+  return authService.isAuthenticatedAfterCheck$.pipe(
     take(1),
-    map(({ isAuthenticated }) => {
+    map((isAuthenticated) => {
       if (isAuthenticated) {
         return true;
       }
-      // Redirect to login
+
+      // Let the in-flight OIDC code exchange finish. A competing authorize()
+      // overwrites PKCE/state and is the main post-login unauthorized race.
+      if (authService.hasOidcCallbackParams()) {
+        return false;
+      }
+
+      authService.saveRedirectUrl(state.url);
       oidcService.authorize();
       return false;
     }),

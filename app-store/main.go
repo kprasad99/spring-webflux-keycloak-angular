@@ -2,24 +2,25 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/etag"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/etag"
+	"github.com/gofiber/fiber/v3/middleware/healthcheck"
+	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-func okHandler(ctx *fiber.Ctx) error {
-	return ctx.SendString("OK")
-}
+const staticDirPath = "/static"
 
 /*
 *
 convert configuration from environment and expose to ui
 */
-func getConf(ctx *fiber.Ctx) error {
+func getConf(ctx fiber.Ctx) error {
 	envs := os.Environ()
 	result := map[string]string{}
 	for _, str := range envs {
@@ -40,7 +41,7 @@ func main() {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
-	contextPath := os.Getenv("WEB_CONTEXT_PATH")
+	contextPath := strings.TrimSuffix(strings.TrimSpace(os.Getenv("WEB_CONTEXT_PATH")), "/")
 	port := os.Getenv("WEB_PORT")
 	host := os.Getenv("WEB_HOST")
 
@@ -55,13 +56,7 @@ func main() {
 		address = host + ":" + port
 	}
 
-	contextPath = strings.TrimSuffix(contextPath, "/")
-
-	config := fiber.Config{
-		DisableStartupMessage: true,
-		Prefork:               false,
-		ReduceMemoryUsage:     true,
-	}
+	config := fiber.Config{ReduceMemoryUsage: true}
 
 	readBufferSize := os.Getenv("READ_BUFFER_SIZE")
 	if readBufferSize != "" {
@@ -83,12 +78,14 @@ func main() {
 
 	// Register health endpoints FIRST, before any middleware
 	// This ensures they respond quickly without middleware overhead
-	app.Get("/liveness", okHandler)
-	app.Get("/readiness", okHandler)
+	app.Get(healthcheck.LivenessEndpoint, healthcheck.New())
+	app.Get(healthcheck.ReadinessEndpoint, healthcheck.New())
+	app.Get(healthcheck.StartupEndpoint, healthcheck.New())
+
 	if contextPath != "" {
 		app.Get(contextPath+"/conf", getConf)
-		app.Get("/", func(ctx *fiber.Ctx) error {
-			return ctx.Redirect(contextPath + "/index.html")
+		app.Get("/", func(ctx fiber.Ctx) error {
+			return ctx.Redirect().To(contextPath + "/")
 		})
 	} else {
 		app.Get("/conf", getConf)
@@ -97,10 +94,13 @@ func main() {
 	// Use ETag middleware
 	app.Use(etag.New())
 
-	// Serve static files - use Browse:false to prevent directory listing
-	app.Static(contextPath, "/static", fiber.Static{
-		Browse:    false,
+	app.Use(contextPath, static.New("", static.Config{
+		FS:        os.DirFS(staticDirPath),
+		Browse:    false, // Disable directory listing
 		ByteRange: true,
+	}))
+	app.Get(contextPath+"/*", func(c fiber.Ctx) error {
+		return c.SendFile(filepath.Join(staticDirPath, "index.html"))
 	})
 
 	log.Info().Str("address", address).Msg("Starting web server")
@@ -122,7 +122,7 @@ func main() {
 		return nil
 	})
 
-	if err := app.Listen(address); err != nil {
+	if err := app.Listen(address, fiber.ListenConfig{EnablePrefork: false, DisableStartupMessage: true}); err != nil {
 		log.Fatal().Err(err).Msg("Failed to start web server")
 	}
 

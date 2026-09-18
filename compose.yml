@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: "traefik:3.6"
+    image: "traefik:3.7"
     command:
       #  - "--log.level=DEBUG"
       - "--api.insecure=true"
@@ -137,7 +137,7 @@ services:
       spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/auth/realms/universal
       ingress.urls: "https://${SERVER_IP}/auth/realms/universal"
   keycloak:
-    image: quay.io/keycloak/keycloak:26.4.6
+    image: quay.io/keycloak/keycloak:26.7.4
     networks:
     - k-network
     ports:

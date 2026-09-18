@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +14,7 @@ interface AppItem {
   selector: 'kp-apps-list',
   imports: [MatCardModule, MatIconModule, MatButtonModule],
   templateUrl: './apps-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './apps-list.scss',
 })
 export class AppsList implements OnInit {

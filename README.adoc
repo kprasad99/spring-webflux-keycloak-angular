@@ -7,7 +7,7 @@
 
 ## Features
 
-- Spring WebFlux as Resource Server (Spring Boot 4.0)
+- Spring WebFlux as Resource Server (Spring Boot 4.1)
 - Keycloak as OIDC provider
 - Angular 21 application with SSO
 - App store example with PWA support
