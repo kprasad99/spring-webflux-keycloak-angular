@@ -1,4 +1,11 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +20,7 @@ import { AuthService } from '../auth/auth';
   selector: 'kp-sso',
   imports: [MatProgressSpinnerModule, MatButtonModule],
   templateUrl: './sso.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './sso.scss',
 })
 export class Sso implements OnInit {

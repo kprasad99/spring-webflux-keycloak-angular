@@ -1,26 +1,26 @@
 <h2 mat-dialog-title>Add Employee</h2>
-<form [formGroup]="empForm" class="emp-form">
+<form novalidate class="emp-form">
   <mat-dialog-content class="mat-typography">
     <mat-form-field class="w-full">
       <mat-label>First Name</mat-label>
-      <input matInput formControlName="firstName" />
-      @if (empForm.controls.firstName.hasError('required')) {
+      <input matInput [formField]="empForm.firstName" />
+      @if (empForm.firstName().touched() && empForm.firstName().invalid()) {
         <mat-error>First Name is <strong>required</strong></mat-error>
       }
     </mat-form-field>
 
     <mat-form-field class="w-full">
       <mat-label>Last Name</mat-label>
-      <input matInput formControlName="lastName" />
-      @if (empForm.controls.lastName.hasError('required')) {
+      <input matInput [formField]="empForm.lastName" />
+      @if (empForm.lastName().touched() && empForm.lastName().invalid()) {
         <mat-error>Last Name is <strong>required</strong></mat-error>
       }
     </mat-form-field>
 
     <mat-form-field class="w-full">
       <mat-label>Age</mat-label>
-      <input matInput type="number" formControlName="age" />
-      @if (empForm.controls.age.hasError('required')) {
+      <input matInput type="number" [formField]="empForm.age" />
+      @if (empForm.age().touched() && empForm.age().invalid()) {
         <mat-error>Age is <strong>required</strong></mat-error>
       }
     </mat-form-field>
@@ -29,8 +29,8 @@
     <button mat-button mat-dialog-close>Cancel</button>
     <button
       mat-button
-      [mat-dialog-close]="empForm.value"
-      [disabled]="!isFormValid()"
+      [mat-dialog-close]="empModel()"
+      [disabled]="!empForm().valid()"
       cdkFocusInitial
     >
       Save

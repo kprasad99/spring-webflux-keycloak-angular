@@ -1,8 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
-
-import { HttpClient } from '@angular/common/http';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
@@ -11,6 +9,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterOutlet } from '@angular/router';
 
+import { map } from 'rxjs';
+
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 import { AuthService } from '../auth/auth';
@@ -18,7 +18,6 @@ import { AuthService } from '../auth/auth';
 @Component({
   selector: 'kp-home',
   imports: [
-    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
@@ -34,26 +33,17 @@ import { AuthService } from '../auth/auth';
     class: 'block h-screen',
   },
 })
-export class Home implements OnInit {
-  private readonly http = inject(HttpClient);
+export class Home {
   private readonly oidcSecurityService = inject(OidcSecurityService);
   private readonly authService = inject(AuthService);
 
-  protected readonly user = signal('');
+  protected readonly user = toSignal(
+    this.oidcSecurityService.userData$.pipe(
+      map(({ userData }) => userData?.name || userData?.preferred_username || ''),
+    ),
+    { initialValue: '' },
+  );
 
-  ngOnInit(): void {
-    // Get user data from the already authenticated session
-    this.oidcSecurityService.userData$.subscribe(({ userData }) => {
-      if (userData) {
-        this.user.set(userData.name || userData.preferred_username || '');
-      }
-    });
-  }
-
-  /**
-   * User-initiated logout - revokes tokens and redirects to Keycloak logout
-   * This will trigger SSO logout across all apps in the same realm
-   */
   logout(): void {
     this.authService.logout().subscribe();
   }

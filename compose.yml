@@ -35,13 +35,12 @@ services:
     # HTTP router with redirect to HTTPS
     - traefik.http.routers.app-store-web.rule=PathPrefix(`/`)
     - traefik.http.routers.app-store-web.entrypoints=web
-    - traefik.http.routers.app-store-web.middlewares=redirect-middleware
+    - traefik.http.routers.app-store-web.middlewares=app-store-redirect
     # HTTPS router
     - traefik.http.routers.app-store-websecure.rule=PathPrefix(`/`)
     - traefik.http.routers.app-store-websecure.entrypoints=websecure
     - traefik.http.routers.app-store-websecure.tls=true
-    # Redirect middleware (shared)
-    - traefik.http.middlewares.redirect-middleware.redirectscheme.scheme=https
+    - traefik.http.middlewares.app-store-redirect.redirectscheme.scheme=https
     environment:
       GOMEMLIMIT: 100MiB
       GOGC: off
@@ -74,7 +73,8 @@ services:
     # HTTP router with redirect to HTTPS
     - traefik.http.routers.emp-app-web.rule=PathPrefix(`/emp-app`)
     - traefik.http.routers.emp-app-web.entrypoints=web
-    - traefik.http.routers.emp-app-web.middlewares=redirect-middleware
+    - traefik.http.middlewares.emp-app-redirect.redirectscheme.scheme=https
+    - traefik.http.routers.emp-app-web.middlewares=emp-app-redirect
     # HTTPS router
     - traefik.http.routers.emp-app-websecure.rule=PathPrefix(`/emp-app`)
     - traefik.http.routers.emp-app-websecure.entrypoints=websecure
@@ -123,7 +123,8 @@ services:
     # HTTP router with redirect to HTTPS
     - traefik.http.routers.employee-backend-web.rule=PathPrefix(`/api`)
     - traefik.http.routers.employee-backend-web.entrypoints=web
-    - traefik.http.routers.employee-backend-web.middlewares=redirect-middleware
+    - traefik.http.middlewares.employee-backend-redirect.redirectscheme.scheme=https
+    - traefik.http.routers.employee-backend-web.middlewares=employee-backend-redirect
     # HTTPS router
     - traefik.http.routers.employee-backend-websecure.rule=PathPrefix(`/api`)
     - traefik.http.routers.employee-backend-websecure.entrypoints=websecure

@@ -1,4 +1,4 @@
-import { inject, Injectable, NgZone, OnDestroy, signal } from '@angular/core';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
 
 import { Router } from '@angular/router';
 
@@ -25,7 +25,6 @@ const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'
 @Injectable({ providedIn: 'root' })
 export class IdleService implements OnDestroy {
   private readonly router = inject(Router);
-  private readonly ngZone = inject(NgZone);
   private readonly oidcService = inject(OidcSecurityService);
 
   private timeoutId?: ReturnType<typeof setTimeout>;
@@ -49,14 +48,11 @@ export class IdleService implements OnDestroy {
       this.idleTimeoutMs = timeoutMinutes * 60 * 1000;
     }
 
-    // Run outside Angular zone to avoid triggering change detection on every activity event
-    this.ngZone.runOutsideAngular(() => {
-      ACTIVITY_EVENTS.forEach((event) => {
-        document.addEventListener(event, this.boundResetTimer, { passive: true });
-      });
-
-      this.resetTimer();
+    ACTIVITY_EVENTS.forEach((event) => {
+      document.addEventListener(event, this.boundResetTimer, { passive: true });
     });
+
+    this.resetTimer();
 
     this.isRunning = true;
   }
@@ -107,16 +103,13 @@ export class IdleService implements OnDestroy {
     this.stop();
     this.idleLogout.set(true);
 
-    // Run navigation inside Angular zone
-    this.ngZone.run(() => {
-      // Log out locally (don't call IdP - session may still be valid there)
-      this.oidcService.logoffLocal();
+    // Log out locally (don't call IdP - session may still be valid there)
+    this.oidcService.logoffLocal();
 
-      // Navigate to auth-error page with idle reason
-      this.router.navigate(['/auth-error'], {
-        queryParams: { reason: 'idle' },
-        replaceUrl: true,
-      });
+    // Navigate to auth-error page with idle reason
+    this.router.navigate(['/auth-error'], {
+      queryParams: { reason: 'idle' },
+      replaceUrl: true,
     });
   }
 }

@@ -1,4 +1,12 @@
-import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
 import { Router, RouterOutlet } from '@angular/router';
@@ -21,6 +29,7 @@ import { LogoutChannelService } from './auth/logout-channel.service';
 @Component({
   selector: 'kp-root',
   imports: [RouterOutlet],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `<router-outlet></router-outlet>`,
 })
 export class App implements OnInit, OnDestroy {

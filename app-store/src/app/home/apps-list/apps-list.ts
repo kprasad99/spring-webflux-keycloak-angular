@@ -1,6 +1,6 @@
-import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { HttpClient } from '@angular/common/http';
+import { httpResource } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,14 +17,6 @@ interface AppItem {
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './apps-list.scss',
 })
-export class AppsList implements OnInit {
-  private readonly http = inject(HttpClient);
-  protected readonly apps = signal<AppItem[]>([]);
-
-  ngOnInit(): void {
-    // Load apps
-    this.http.get<AppItem[]>('./apps.json').subscribe((apps) => {
-      this.apps.set(apps);
-    });
-  }
+export class AppsList {
+  protected readonly appsResource = httpResource<AppItem[]>(() => './apps.json');
 }

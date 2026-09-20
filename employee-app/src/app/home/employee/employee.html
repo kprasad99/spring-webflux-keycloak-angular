@@ -1,5 +1,5 @@
 <div class="w-full">
-  @if (userData()?.authorities | hasAdmin) {
+  @if ((userData()?.authorities) | hasAdmin) {
     <div class="flex gap-2 mb-2 ml-2 mt-2">
       <button mat-raised-button (click)="add()">Add Employee</button>
       <button mat-raised-button (click)="remove()">Remove Employee</button>

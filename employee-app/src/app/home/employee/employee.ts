@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { httpResource } from '@angular/common/http';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -41,7 +43,7 @@ export interface Column {
   styleUrl: './employee.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Employee implements OnInit {
+export class Employee {
   private readonly empService = inject(EmployeeService);
   private readonly auth = inject(OidcSecurityService);
   private readonly dialog = inject(MatDialog);
@@ -50,12 +52,20 @@ export class Employee implements OnInit {
   protected readonly dataSource = new MatTableDataSource<EmployeeData>();
   protected readonly selection = new SelectionModel<EmployeeData>(true, []);
   protected readonly userData = signal<UserData | null>(null);
+  protected readonly employeesResource = httpResource<EmployeeData[]>(() => '/api/employee');
 
-  ngOnInit(): void {
-    this.auth.checkAuth().subscribe(({ userData }) => {
-      this.userData.set(userData);
+  constructor() {
+    effect(() => {
+      const employees = this.employeesResource.value();
+      if (employees) {
+        this.dataSource.data = employees;
+      }
     });
-    this.empService.list().subscribe((e) => (this.dataSource.data = e));
+
+    this.auth
+      .checkAuth()
+      .pipe(takeUntilDestroyed())
+      .subscribe(({ userData }) => this.userData.set(userData));
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -85,31 +95,18 @@ export class Employee implements OnInit {
   }
 
   add(): void {
-    const dialogRef = this.dialog.open(EmployeeDialog, {
-      width: '360px',
-      data: {},
-    });
+    const dialogRef = this.dialog.open(EmployeeDialog, { width: '360px', data: {} });
     dialogRef.afterClosed().subscribe((result) => {
-      this.empService
-        .add(result)
-        .subscribe((r) => (this.dataSource.data = [...this.dataSource.data, r]));
+      if (result) {
+        this.empService.add(result).subscribe(() => this.employeesResource.reload());
+      }
     });
   }
 
   remove(): void {
     for (const e of this.selection.selected) {
-      this.empService.remove(e).subscribe(() => {
-        this.dataSource.data = this.removeItem(this.dataSource.data, 'id', e.id);
-      });
+      this.empService.remove(e).subscribe(() => this.employeesResource.reload());
     }
     this.selection.clear();
-  }
-
-  removeItem<T>(arr: T[], prop: keyof T, key: T[keyof T]): T[] {
-    const index = arr.findIndex((e) => e[prop] === key);
-    if (index > -1) {
-      arr.splice(index, 1);
-    }
-    return [...arr];
   }
 }

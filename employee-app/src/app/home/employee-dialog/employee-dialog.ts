@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { form, FormField, min, required } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,7 +11,7 @@ import { EmployeeData } from '../employee/employee';
 @Component({
   selector: 'kp-employee-dialog',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
@@ -26,32 +25,12 @@ export class EmployeeDialog {
   private readonly dialogRef = inject(MatDialogRef<EmployeeDialog>);
   readonly data = inject<EmployeeData>(MAT_DIALOG_DATA);
 
-  protected readonly empForm = new FormGroup({
-    firstName: new FormControl('', [Validators.required]),
-    lastName: new FormControl('', [Validators.required]),
-    age: new FormControl(1, [Validators.required, Validators.min(1)]),
-  });
-
-  // Convert form status to signal for reactive template usage
-  private readonly formStatus = toSignal(this.empForm.statusChanges, {
-    initialValue: this.empForm.status,
-  });
-
-  protected readonly isFormValid = computed(() => this.formStatus() === 'VALID');
-
-  protected readonly firstNameError = computed(() => {
-    const control = this.empForm.controls.firstName;
-    return control.touched && control.hasError('required');
-  });
-
-  protected readonly lastNameError = computed(() => {
-    const control = this.empForm.controls.lastName;
-    return control.touched && control.hasError('required');
-  });
-
-  protected readonly ageError = computed(() => {
-    const control = this.empForm.controls.age;
-    return control.touched && control.hasError('required');
+  protected readonly empModel = signal({ firstName: '', lastName: '', age: 1 });
+  protected readonly empForm = form(this.empModel, (s) => {
+    required(s.firstName, { message: 'First Name is required' });
+    required(s.lastName, { message: 'Last Name is required' });
+    required(s.age, { message: 'Age is required' });
+    min(s.age, 1, { message: 'Age must be at least 1' });
   });
 
   onNoClick(): void {
